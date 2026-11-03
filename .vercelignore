@@ -1,0 +1,4 @@
+# Only the static site is deployed; keep env files, screenshots and QA tooling out of the upload.
+/*
+!dist
+!vercel.json
