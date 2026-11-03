@@ -72,7 +72,6 @@ The owner's stated longer-term direction is **pantry-first**: start from what is
   - Checkboxes for items bought.
   - The remaining-item count shows both on the page and in the header navigation badge.
 - Small wins keeps all-time cooked recipes separate from progress through the current plan. Per-recipe feedback options: Easy & enjoyable / Took longer / Missing ingredients.
-- Reset demo restores the default state.
 - **Sprout**, a kitchen-companion mascot (`sprout.js`, `sprout.css`, `assets/sprout/`), sits bottom-right and slides aside whenever a control is underneath it.
   - It waves once on a first visit, and the greeting can be dismissed. Sprout can be hidden, and brought back from the footer.
   - Its chat panel answers from the app's real state and recipes, using the same scaling helpers (`scaledIngredients`, `scaledStep`) as the recipe dialog.
@@ -113,7 +112,7 @@ The owner's stated longer-term direction is **pantry-first**: start from what is
 ## Evidence on Hand
 
 - Fourteen illustrative recipes in `dist/app.js`. They are independent examples, not official Satvic Movement recipes.
-- Fifteen photos in `dist/assets/`, credited in `dist/credits.html`:
+- Fifteen photos in `dist/assets/`, credited in `dist/credits.html` (no longer linked from the footer; the sound player links to its Sounds section):
   - Unsplash: the vegetable bowls (`hero.jpg` and `chickpea.jpg` are the same image) and the tomato soup.
   - Food Trails: khichdi.
   - Eat-Vegan: vegetable stew.

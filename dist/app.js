@@ -107,7 +107,7 @@ function setMenu(open){document.querySelector('.sidebar').classList.toggle('open
 document.getElementById('mobile-menu').addEventListener('click',()=>setMenu(!document.querySelector('.sidebar').classList.contains('open')));
 document.addEventListener('pointerdown',e=>{if(document.querySelector('.sidebar.open')&&!e.target.closest('.sidebar'))setMenu(false);});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.querySelector('.sidebar.open')){setMenu(false);document.getElementById('mobile-menu').focus();}});
-document.getElementById('reset-demo').addEventListener('click',()=>{state=fresh();view='plan';filter='All recipes';query='';shoppingTab='need';render();toast('Started over.');window.Ritual?.open();});
+document.getElementById('reset-demo')?.addEventListener('click',()=>{state=fresh();view='plan';filter='All recipes';query='';shoppingTab='need';render();toast('Started over.');window.Ritual?.open();});
 document.querySelectorAll('dialog').forEach(dialog=>dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}}));
 // Back button / gesture: each view has its own history entry, and an open dialog adds one more,
 // so Back closes the dialog first, then steps through views, instead of leaving the app.
