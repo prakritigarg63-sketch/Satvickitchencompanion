@@ -69,7 +69,11 @@
         inPantry: shop.pantry.map(k => ingredients[k].name),
       },
       cookedAllTime: state.cooked.map(id => find(id)?.name).filter(Boolean),
-      recipes: recipes.map(r => ({ id: r.id, name: r.name, minutes: r.time, category: r.category, nuts: r.nuts })),
+      cookName: state.name || null,
+      season: { name: ritu().name, english: ritu().en, note: ritu().line },
+      localTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      soakTonight: soakItems().map(({ r, i }) => ({ day: i + 1, recipe: r.name, soak: `${soakAmount(r)} ${r.soak.what}`, hours: r.soak.hours, done: state.soaked.includes(r.id) })),
+      recipes: recipes.map(r => ({ id: r.id, name: r.name, minutes: r.time, category: r.category, nuts: r.nuts, raw: r.raw, bestAt: MOMENT[r.moment].tag, inSeason: inSeason(r), soakAhead: r.soak ? `${r.soak.hours} h ${r.soak.what}` : null, ingredients: Object.keys(r.ingredients).map(k => ingredients[k].name) })),
     };
   }
 
@@ -142,7 +146,72 @@
     return `${people(state.servings)}, up to ${state.time} minutes${state.nutFree ? ', no nuts' : ''}`;
   }
 
+  /* ---------- Kitchen Calm (sounds.js) ---------- */
+  const KC = () => window.KitchenCalm;
+  const MUSIC_WORDS = ['music', 'sound', 'sounds', 'song', 'songs', 'track', 'tracks', 'playlist', 'ambience', 'calming', 'relaxing',
+    'flute', 'bansuri', 'bowl', 'singing bowl', 'garden', 'nature', 'birdsong', 'birds', 'tanpura', 'drone', 'kitchen calm', 'volume', 'quieter', 'louder', 'softer', 'mute', 'unmute'];
+  const musicLike = raw => { const t = norm(raw); return has(t, ...MUSIC_WORDS) || /^ (play|pause|stop|resume|next|skip) /.test(t); };
+  // Only the flute track exists for now; it has a soft river-and-birds bed, so “nature sounds” plays it too.
+  function trackFrom(t) {
+    if (has(t, 'tanpura', 'drone', 'bowl', 'bowls', 'singing bowl', 'rain', 'ocean', 'piano')) return 'missing';
+    return 'flute-stillness';
+  }
+  const trackName = id => KC()?.tracks.find(x => x.id === id)?.name || 'that track';
+  const noPlayer = () => ({ blocks: [text('The sound player isn’t available on this page right now.')] });
+  // Sprout only says music is playing once playback has actually started.
+  function playReply(r) {
+    if (r.ok) return { blocks: [text(`Playing ${r.track.name}. 🌿`)], actions: [act('sounds-open', 'Show the playlist')] };
+    if (r.reason === 'blocked') return { blocks: [text('Your browser wants one tap before it plays sound.')], actions: [act('sounds-play', 'Tap to play', { id: r.track.id, primary: true })] };
+    if (r.reason === 'unavailable' || r.reason === 'unknown') return { blocks: [text('I only have one sound for now: Flute & Stillness, a soft bansuri over a quiet river and birds.')], actions: [act('sounds-play', 'Play Flute & Stillness', { id: 'flute-stillness', primary: true })] };
+    if (r.reason === 'superseded') return { blocks: [text('Switched to another sound.')] };
+    return { blocks: [text(`I couldn’t load ${r.track?.name || 'that sound'}. It may be a connection hiccup.`)], actions: [act('sounds-retry', 'Retry', { primary: true }), act('sounds-open', 'Show the playlist')] };
+  }
+  async function musicPlay(id) { return KC() ? playReply(await KC().play(id)) : noPlayer(); }
+
   const intents = [
+    { name: 'music-playlist', test: t => has(t, 'playlist', 'kitchen calm') || (has(t, 'show', 'open', 'choose', 'list', 'which', 'what') && has(t, 'sounds', 'music', 'tracks', 'songs')), run: () => {
+      if (!KC()) return noPlayer();
+      KC().open();
+      const s = KC().state();
+      return { blocks: [text(KC().tracks.length > 1 ? 'Here’s Kitchen Calm — pick whatever feels right:' : 'Here’s Kitchen Calm. For now it has one calming sound:'), list(KC().tracks.map(x => `${x.name} — ${x.desc}${x.id === s.track && s.status === 'playing' ? ' (playing)' : ''}`))] };
+    } },
+    { name: 'music-pause', test: t => has(t, 'pause') || (has(t, 'stop') && musicLike(t) && !has(t, 'stop it')) || has(t, 'turn off the music', 'turn the music off'), run: async t => {
+      if (!KC()) return noPlayer();
+      const s = KC().state();
+      if (has(t, 'stop') && !has(t, 'pause')) { await KC().stop(); return { blocks: [text('Stopped. The kitchen is quiet again.')], actions: [act('sounds-play', 'Play again', { id: s.track })] }; }
+      if (s.status !== 'playing' && s.status !== 'loading') return { blocks: [text('Nothing is playing right now.')], actions: [act('sounds-play', `Play ${trackName(s.track)}`, { id: s.track, primary: true })] };
+      await KC().pause({ quiet: true });
+      return { blocks: [text('Paused. Ready whenever you are.')], actions: [act('sounds-play', 'Resume', { id: s.track, primary: true })] };
+    } },
+    { name: 'music-next', test: t => musicLike(t) && has(t, 'next', 'skip', 'another', 'different', 'previous', 'last one', 'go back'), run: async t => {
+      if (!KC()) return noPlayer();
+      const r = await (has(t, 'previous', 'last one', 'go back') ? KC().prev() : KC().next());
+      if (r.reason === 'only-one') return { blocks: [text(`There’s just one sound for now — ${r.track.name}. I’ll keep it playing.`)], actions: [act('sounds-open', 'Show the playlist')] };
+      if (r.selectedOnly) return { blocks: [text(`${r.track.name} is selected. Shall I play it?`)], actions: [act('sounds-play', `Play ${r.track.name}`, { id: r.track.id, primary: true })] };
+      return playReply(r);
+    } },
+    { name: 'music-volume', test: t => has(t, 'quieter', 'softer', 'lower', 'too loud', 'turn it down', 'turn down', 'louder', 'turn it up', 'turn up', 'volume', 'mute', 'unmute'), run: t => {
+      if (!KC()) return noPlayer();
+      if (has(t, 'unmute')) { KC().setMuted(false); return { blocks: [text(`Sound is back on at ${Math.round(KC().state().volume * 100)}%.`)] }; }
+      if (has(t, 'mute')) { KC().setMuted(true); return { blocks: [text('Muted. Your track keeps its place; unmute whenever you like.')] }; }
+      const down = has(t, 'quieter', 'softer', 'lower', 'too loud', 'turn it down', 'turn down', 'down');
+      const v = KC().changeVolume(down ? -0.15 : 0.15);
+      const where = KC().state().status === 'playing' ? '' : ' It will apply when the music plays.';
+      return { blocks: [text(`${down ? 'A little quieter' : 'A little louder'} — volume is now ${Math.round(v * 100)}%.${where}`)], actions: [act('sounds-open', 'Show the playlist')] };
+    } },
+    { name: 'music-play', test: t => (has(t, 'play', 'start', 'put on', 'resume', 'turn on') && musicLike(t)) || /^ play /.test(t), run: t => {
+      const id = trackFrom(t);
+      return id === 'missing' ? Promise.resolve(playReply({ ok: false, reason: 'unknown' })) : musicPlay(id);
+    } },
+    { name: 'soak', test: t => has(t, 'soak', 'soaking', 'soaked', 'sprout', 'sprouting', 'night before'), run: () => {
+      const items = soakItems();
+      if (!items.length) return { blocks: [text('Nothing in this week’s plan needs soaking. Every meal can be cooked straight away.')], actions: [act('open-plan', 'Open my week')] };
+      return { blocks: [text('Here’s what to soak the night before:'), list(items.map(({ r, i }) => `${soakAmount(r)} ${r.soak.what}, ${r.soak.hours} hours${r.soak.note ? ` (${r.soak.note})` : ''}, for Day 0${i + 1}’s ${r.name}${state.soaked.includes(r.id) ? ' · done' : ''}`))], actions: [act('open-plan', 'Open my week', { primary: true })] };
+    } },
+    { name: 'season', test: t => has(t, 'season', 'seasonal', 'in season', 'ritu', 'harvest'), run: () => {
+      const s = ritu(), h = harvest();
+      return { blocks: [text(`It’s ${s.name}, ${s.en}. ${s.line}`), recipeList(h.slice(0, 4).map(r => r.id))], actions: [act('view-recipes', 'See this week’s harvest')] };
+    } },
     { name: 'greeting', test: t => /^ (hi|hello|hey|namaste|good (morning|afternoon|evening)) /.test(t), run: () => ({
       blocks: [text(`Hello! I'm here whenever you need a hand. I can see you're cooking for ${prefsLine()}.`)],
       suggestions: SUGGESTIONS,
@@ -167,10 +236,10 @@
       const planned = plannedIds(), done = planned.filter(id => state.planDone.includes(id));
       const blocks = [text(state.cooked.length
         ? `You’ve cooked ${state.cooked.length} ${state.cooked.length === 1 ? 'recipe' : 'recipes'} so far, and ${done.length} of ${planned.length} meals in this plan. That’s lovely progress.`
-        : 'No meals marked as cooked yet. Your first small win is one recipe away.')];
+        : 'No meals marked as cooked yet. Your first one is a recipe away.')];
       const next = nextToCook();
       if (next) blocks.push(text(`Next up in your plan: ${find(next).name}.`));
-      return { blocks, actions: [act('see-wins', 'See my small wins', { primary: true }), ...(next ? [act('start-cooking', 'Start cooking', { id: next })] : [])] };
+      return { blocks, actions: [act('see-wins', 'See what I’ve cooked', { primary: true }), ...(next ? [act('start-cooking', 'Start cooking', { id: next })] : [])] };
     } },
     { name: 'pantry-cook', test: t => has(t, 'use up', 'leftover', 'leftovers') || (has(t, 'pantry', 'already have', 'i have', 'got') && has(t, 'cook', 'make', 'recipe', 'recipes')), run: t => {
       const named = ingredientMentions(t);
@@ -303,7 +372,7 @@
     return {
       blocks: [
         { type: 'step', label: `Step ${i + 1} of ${r.steps.length}`, text: scaledStep(r.steps[i]) },
-        ...(last ? [text('That’s the last step. When you’ve finished, open the recipe and tap “I cooked this!” to save your small win.')] : []),
+        ...(last ? [text('That’s the last step. When you’ve finished, open the recipe and tap “I cooked this” to save it.')] : []),
       ],
       actions: last ? [act('start-cooking', 'Start cooking', { id, primary: true, label2: 'Open recipe to finish' })]
         : [act('next-step', 'Next step', { id, step: i + 1, primary: true }), act('start-cooking', 'Start cooking', { id })],
@@ -326,7 +395,7 @@
 
   /* Remote adapter for a future AI endpoint. Replies are checked against the
      actual recipes and allowed actions before anything is shown. */
-  const ACTIONS = new Set(['view-recipe', 'choose-day', 'open-plan', 'view-shopping', 'start-cooking', 'see-wins', 'next-step', 'preferences', 'view-recipes']);
+  const ACTIONS = new Set(['view-recipe', 'choose-day', 'open-plan', 'view-shopping', 'start-cooking', 'see-wins', 'next-step', 'preferences', 'view-recipes', 'sounds-open', 'sounds-play', 'sounds-retry']);
   function sanitizeReply(data) {
     const blocks = Array.isArray(data?.blocks) ? data.blocks : [{ type: 'text', text: String(data?.text ?? '') }];
     return {
@@ -348,7 +417,17 @@
   });
 
   const endpoint = document.querySelector('meta[name="sprout-endpoint"]')?.content;
-  let adapter = endpoint ? RemoteKitchenAI(endpoint) : LocalKitchenGuide;
+  const WithLocalFallback = remote => {
+    let down = false;
+    return {
+      id: 'remote', get label() { return down ? LocalKitchenGuide.label : remote.label; },
+      async reply(args) {
+        if (!down) { try { return await remote.reply(args); } catch { down = true; setTimeout(() => setMode(), 0); } }
+        return LocalKitchenGuide.reply(args);
+      },
+    };
+  };
+  let adapter = endpoint ? WithLocalFallback(RemoteKitchenAI(endpoint)) : LocalKitchenGuide;
 
   /* ================================================================== *
    *  Markup                                                             *
@@ -509,6 +588,7 @@
   form.addEventListener('submit', e => {
     e.preventDefault();
     const value = input.value;
+    if (musicLike(value)) window.KitchenCalm?.prime();      // unlock audio inside the keypress, before the async reply
     input.value = '';
     sendBtn.disabled = true;
     ask(value);
@@ -532,11 +612,15 @@
       case 'see-wins': leavePanel(); return go('progress');
       case 'view-recipes': leavePanel(); return go('recipes');
       case 'preferences': return showPreferences();
+      case 'sounds-open': return window.KitchenCalm?.open();
+      case 'sounds-play': return musicPlay(id || undefined).then(sproutSays);
+      case 'sounds-retry': return window.KitchenCalm?.retry().then(r => sproutSays(playReply(r)));
     }
   }
   root.addEventListener('click', e => {
     const el = e.target.closest('button');
     if (!el || !root.contains(el)) return;
+    if (/^sounds-/.test(el.dataset.sproutAction || '') || musicLike(el.dataset.ask || '')) window.KitchenCalm?.prime();   // unlock audio inside the click
     if (el.dataset.sproutAction) return runAction(el.dataset.sproutAction, el.dataset.id, Number(el.dataset.step), !!el.dataset.guide);
     if (el.dataset.ask) return ask(el.dataset.ask);
     if (el.dataset.retry != null) return ask(el.dataset.retry, { echo: false });
@@ -547,6 +631,7 @@
    * ================================================================== */
   function open() {
     hideBubble(true);
+    document.dispatchEvent(new CustomEvent('sprout:open'));
     chat.open = true; chat.minimised = false; saveChat();
     panel.hidden = false;
     panel.classList.remove('is-minimised');
@@ -622,19 +707,53 @@
    *  Welcome bubble + celebration bubble                                *
    * ================================================================== */
   let bubbleTimer;
-  function showBubble(html, { autoHide = 0, label = 'Message from Sprout' } = {}) {
-    if (!panel.hidden) return;
+  function showBubble(html, { autoHide = 0, label = 'Message from Sprout', kind = '', avoidControls = false } = {}) {
+    if (!panel.hidden || root.hidden) return false;
+    if (!bubble.hidden && bubble.dataset.kind) document.dispatchEvent(new CustomEvent('sprout:bubble-hidden', { detail: { kind: bubble.dataset.kind } }));
+    bubble.dataset.kind = kind;
     bubble.innerHTML = `<button type="button" class="sprout-bubble-close" aria-label="Dismiss message">×</button>${html}`;
     bubble.setAttribute('aria-label', label);
     bubble.hidden = false;
     untuck();
+    if (!placeBubble() && avoidControls) { bubble.dataset.kind = ''; bubble.hidden = true; bubble.style.translate = ''; checkCollision(); return false; }
+    bubble.dataset.avoid = avoidControls ? '1' : '';
     clearTimeout(bubbleTimer);
     if (autoHide) bubbleTimer = setTimeout(() => hideBubble(true), autoHide);
+    return true;
   }
+  // Keep speech bubbles off the page's controls: try nearby spots (higher, then further left)
+  // and use the first one that covers no button, link or field.
+  const CONTROLS = 'button,a[href],input,select,textarea,label,[role="button"]';
+  function placeBubble() {
+    if (bubble.hidden) return true;
+    // Measure where the bubble will rest, not mid pop-in or mid-glide.
+    bubble.getAnimations().forEach(a => a.finish?.());
+    bubble.style.transition = 'none';
+    bubble.style.translate = '';
+    const base = bubble.getBoundingClientRect();
+    requestAnimationFrame(() => { bubble.style.transition = ''; });
+    const controls = [...document.querySelectorAll(CONTROLS)]
+      .filter(el => !root.contains(el) && !el.closest('#kitchen-calm') && el.offsetParent && !el.closest('dialog:not([open])'))
+      .map(el => el.getBoundingClientRect()).filter(r => r.width && r.height && r.bottom > 0 && r.top < innerHeight);
+    const covers = (dx, dy) => controls.some(r => r.right > base.left + dx + 2 && r.left < base.right + dx - 2 && r.bottom > base.top + dy + 2 && r.top < base.bottom + dy - 2);
+    const top = parseFloat(getComputedStyle(document.querySelector('.sidebar') || document.body).getPropertyValue('top')) || 0;
+    for (const dx of [0, -110, -220]) for (let dy = 0; dy >= -360; dy -= 30) {
+      if (base.top + dy < top + 90 || base.left + dx < 8) continue;          // stay below the nav pill, on screen
+      if (!covers(dx, dy)) { bubble.style.translate = dx || dy ? `${dx}px ${dy}px` : ''; return true; }
+    }
+    return false;
+  }
+  let bubbleRaf = 0;
+  // A message that must not cover controls steps away if scrolling brings controls underneath it.
+  addEventListener('scroll', () => { if (!bubble.hidden && !bubbleRaf) bubbleRaf = requestAnimationFrame(() => { bubbleRaf = 0; if (!placeBubble() && bubble.dataset.avoid) hideBubble(true); }); }, { passive: true });
+  addEventListener('resize', () => placeBubble());
+
   function hideBubble(silent) {
     if (bubble.hidden) return;
     bubble.hidden = true;
+    bubble.style.translate = '';
     if (bubble.dataset.kind === 'welcome') { prefs.greeted = true; savePrefs(); }
+    document.dispatchEvent(new CustomEvent('sprout:bubble-hidden', { detail: { kind: bubble.dataset.kind } }));
     bubble.dataset.kind = '';
     if (!silent) mascot.focus({ preventScroll: true });
     checkCollision();
@@ -644,15 +763,33 @@
     if (el.classList.contains('sprout-bubble-close') || el.dataset.bubble === 'later') { hideBubble(); return; }
     if (el.dataset.bubble === 'chat') { hideBubble(true); open(); return; }
     if (el.dataset.bubble === 'wins') { hideBubble(true); go('progress'); }
+    if (el.dataset.bubble === 'soaked') { hideBubble(true); if (!state.soaked.includes(el.dataset.id)) state.soaked.push(el.dataset.id); render(); toast('Soaking. Tomorrow’s meal is ready to go.'); }
   });
   function welcome() {
     if (prefs.greeted || prefs.hidden) return;
     showBubble(`<p>Hi, I’m Sprout 🌱 Need a little help in your kitchen?</p>
-      <div class="sprout-bubble-actions"><button type="button" class="button primary" data-bubble="chat">Yes, let’s chat</button><button type="button" class="button outline" data-bubble="later">Not now</button></div>`, { label: 'Sprout says hello' });
-    bubble.dataset.kind = 'welcome';
+      <div class="sprout-bubble-actions"><button type="button" class="button primary" data-bubble="chat">Yes, let’s chat</button><button type="button" class="button outline" data-bubble="later">Not now</button></div>`, { label: 'Sprout says hello', kind: 'welcome' });
     wave();
     announce('Sprout says: Hi, I’m Sprout. Need a little help in your kitchen?');
   }
+
+  /* Contextual nudge: in the evening, if a planned meal needs soaking and it isn't done yet,
+     say so once per day. No generic hello. */
+  function nudge() {
+    // Phones: the soak strip on the plan is the reminder; a bubble would sit over the content.
+    if (prefs.hidden || compact.matches || document.querySelector('dialog[open]') || !state.onboarded) return;
+    const today = new Date().toDateString();
+    if (prefs.nudged === today || new Date().getHours() < 16) return;
+    const item = soakItems().find(({ r }) => !state.soaked.includes(r.id));
+    if (!item) return;
+    const { r, i } = item;
+    if (showBubble(`<p>Before bed: soak ${esc(soakAmount(r))} ${esc(r.soak.what)} for Day 0${i + 1}’s ${esc(r.name.toLowerCase())}. It needs ${r.soak.hours} hours.</p>
+      <div class="sprout-bubble-actions"><button type="button" class="button primary" data-bubble="soaked" data-id="${r.id}">Done, it’s soaking</button><button type="button" class="button outline" data-bubble="later">Later</button></div>`, { label: 'Sprout reminder', kind: 'nudge' })) {
+      prefs.nudged = today; savePrefs();
+      announce(`Sprout says: soak ${soakAmount(r)} ${r.soak.what} tonight for ${r.name}.`);
+    }
+  }
+  document.addEventListener('ritual:done', () => setTimeout(nudge, 6000));
 
   /* After "I cooked this!" the recipe dialog is still open over Sprout, so the
      celebration waits for it to close. */
@@ -666,9 +803,9 @@
     const planned = plannedIds(), done = planned.filter(id => state.planDone.includes(id)).length;
     const progress = planned.includes(r.id) ? `${done} of ${planned.length} planned meals cooked.` : `${state.cooked.length} ${state.cooked.length === 1 ? 'recipe' : 'recipes'} cooked so far.`;
     if (!panel.hidden && !panel.classList.contains('is-minimised')) {
-      sproutSays({ blocks: [text(`You made ${r.name}! 🎉 That’s a small win worth noticing. ${progress}`)], actions: [act('see-wins', 'See my small wins', { primary: true })] });
+      sproutSays({ blocks: [text(`You made ${r.name}! 🎉 Nicely done. ${progress}`)], actions: [act('see-wins', 'See what I’ve cooked', { primary: true })] });
     } else {
-      showBubble(`<p>You made ${esc(r.name)}! 🎉 ${esc(progress)}</p>${view === 'progress' ? '' : '<div class="sprout-bubble-actions"><button type="button" class="button primary" data-bubble="wins">See my small wins</button></div>'}`, { autoHide: 7000, label: 'Sprout celebrates' });
+      showBubble(`<p>You made ${esc(r.name)}! 🎉 ${esc(progress)}</p>${view === 'progress' ? '' : '<div class="sprout-bubble-actions"><button type="button" class="button primary" data-bubble="wins">See what I’ve cooked</button></div>'}`, { autoHide: 7000, label: 'Sprout celebrates' });
       announce(`Sprout says: You made ${r.name}! ${progress}`);
     }
   }
@@ -751,11 +888,17 @@
    * ================================================================== */
   applyHidden();
   if (chat.open && !prefs.hidden) { open(); if (chat.minimised) minimise(true); document.activeElement?.blur(); }
-  else setTimeout(welcome, 1200);
+  else setTimeout(nudge, 2500);
   checkCollision();
 
   window.Sprout = {
     open, close, minimise: () => minimise(true), ask,
+    // for Kitchen Calm and other companions
+    say: (html, opts) => showBubble(html, opts),
+    dismiss: () => hideBubble(true),
+    wave,
+    react: (state, ms = 2400) => play(`is-${state}`, ms),
+    isChatOpen: () => !panel.hidden && !panel.classList.contains('is-minimised'),
     setAdapter(a) { adapter = a; setMode(); },
     adapters: { local: LocalKitchenGuide, remote: RemoteKitchenAI },
   };

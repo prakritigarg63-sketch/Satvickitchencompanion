@@ -1,0 +1,141 @@
+/* The satvic layer: season and soak details, the kitchen ritual, cooking mode, and one shared photo grade.
+   Loaded last, after the editorial layout. */
+
+/* One grade for every food photograph, so photos from different sources read as one set. */
+.hero-art img,.recipe-image>img,.day-meal img,.recipe-detail-art img,.win-card img,.swap-row img,.ritual-plan img{filter:saturate(.84) sepia(.07) contrast(1.03) brightness(1.01)}
+
+/* The greeting row above each page is gone: the page heading carries the context. */
+.topbar{display:none!important}
+.content{padding-top:8px}
+
+/* Hero copy line */
+.hero-copy>p{max-width:430px}
+
+/* Satvic tags on cards */
+.satvic-tags{display:flex;flex-wrap:wrap;gap:6px;margin:-4px 0 14px}
+.satvic-tags span{font-size:9px;letter-spacing:.4px;color:#5d6f4f;border:1px solid #d9dfcf;border-radius:20px;padding:3px 9px;background:#fbfbf5}
+.recipe-card:first-child .satvic-tags,.recipe-card:last-child .satvic-tags{margin:-12px 0 22px}
+
+/* Tonight's soak */
+.soak-strip{display:grid;grid-template-columns:minmax(220px,.8fr) 1.2fr;gap:28px;align-items:start;margin:30px 0 0;padding:26px 28px;border-radius:16px;background:#263a2c;color:#f3efe1}
+.soak-strip .section-kicker{color:#c9d3b8;margin-bottom:10px}
+.soak-head h3{font-family:Georgia,'Times New Roman',serif;font-weight:400;font-size:30px;letter-spacing:-.8px;line-height:1.1;margin:0 0 10px;color:#fffdf1}
+.soak-head p{font-size:12px;line-height:1.7;color:#cfd6c3;margin:0;max-width:300px}
+.soak-strip ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.soak-strip li label{display:flex;gap:14px;align-items:flex-start;padding:14px 16px;border:1px solid #f3efe126;border-radius:12px;cursor:pointer;transition:background .2s,border-color .2s}
+.soak-strip li label:hover{background:#f3efe10d}
+.soak-strip input{accent-color:#e2c99a;width:18px;height:18px;margin-top:2px;flex-shrink:0}
+.soak-strip strong{display:block;font-size:13px;font-weight:600;color:#fffdf1}
+.soak-strip small{display:block;font-size:11px;color:#bfc9b2;margin-top:2px}
+.soak-strip li.done strong{text-decoration:line-through;color:#a9b59c}
+.soak-strip li.done label{border-color:#e2c99a55;background:#e2c99a10}
+
+/* Shopping: what to actually pick up */
+.grocery-row small em{font-style:normal;color:#9c7a45}
+
+/* Recipe dialog */
+.why-note{margin:18px 0 6px;padding:14px 16px;border-left:3px solid #8caa6d;background:#f1f3ea;border-radius:0 8px 8px 0}
+.why-note strong{display:block;font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:#4d6640;margin-bottom:4px}
+.why-note p{margin:0;font-size:12px;line-height:1.7;color:#5f6d55}
+.soak-check{display:flex;align-items:center;gap:8px;margin-top:10px;font-weight:600;color:#7a6236;cursor:pointer}
+.soak-check input{accent-color:var(--green);width:16px;height:16px}
+.detail-bottom{flex-wrap:wrap}
+
+/* Progress: this week's three meals */
+.week-list .win-card{transition:opacity .2s}
+.win-card small{display:block;font-size:9px;letter-spacing:1.2px;color:#8d9780;margin-bottom:3px}
+.win-card.is-waiting{opacity:.62}
+.win-card.is-next{border-color:#b9c9a5;box-shadow:0 6px 22px #3c5d4314}
+.win-card .cook-button{margin-left:auto;font-size:11px;border:1px solid #d3dcc7;padding:7px 13px;border-radius:20px;font-weight:600;white-space:nowrap}
+.win-card.is-next .cook-button{background:var(--green);color:#fff;border-color:var(--green)}
+.win-empty{width:60px;height:60px;border-radius:8px;border:1px dashed #c6d0b9;display:grid;place-items:center;color:#91a07f;font-size:20px;flex-shrink:0}
+
+/* ------------------------------------------------------------------ */
+/* The kitchen ritual                                                   */
+/* ------------------------------------------------------------------ */
+.ritual-dialog{width:min(560px,calc(100vw - 28px));border:0;border-radius:22px;padding:0;background:var(--paper);color:var(--ink);max-height:92vh;box-shadow:0 30px 80px #1d2a2140}
+.ritual-dialog::backdrop{background:#1d2a21b3;backdrop-filter:blur(6px)}
+.ritual-body{padding:46px 44px 38px}
+.ritual-body .eyebrow{color:#8c7a4f;letter-spacing:2px}
+.ritual-body h2{font-family:Georgia,'Times New Roman',serif;font-weight:400;font-size:40px;line-height:1.08;letter-spacing:-1.2px;margin:14px 0 14px}
+.ritual-lede{font-size:13px;line-height:1.7;color:#76806d;margin:0 0 6px;max-width:400px}
+.ritual-dots{display:flex;gap:6px;margin-bottom:22px}
+.ritual-dots i{height:3px;width:28px;border-radius:3px;background:#e1e5d8}
+.ritual-dots i.on{background:var(--green)}
+.ritual-field{display:block;margin:22px 0 8px}
+.ritual-field span{display:block;font-size:12px;font-weight:600;margin-bottom:8px}
+.ritual-field em{font-style:normal;font-weight:400;color:#959d8b}
+.ritual-field input{width:100%;font-size:16px;padding:12px 14px;border:1px solid #d9e0cf;border-radius:10px;background:#fff;color:var(--ink)}
+.ritual-chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 4px}
+.ritual-chips--stack{flex-direction:column}
+.ritual-chip{text-align:left;border:1px solid #d9e0cf;background:#fff;border-radius:12px;padding:12px 16px;font-size:13px;font-weight:600;color:#3f5344;transition:border-color .15s,background .15s}
+.ritual-chip small{display:block;font-weight:400;font-size:11px;color:#8a9381;margin-top:2px}
+.ritual-chip:hover{border-color:#a9bb94}
+.ritual-chip[aria-pressed="true"]{background:#2f4a36;border-color:#2f4a36;color:#fffdf1}
+.ritual-chip[aria-pressed="true"] small{color:#c9d3b8}
+.ritual-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:30px}
+.ritual-actions .button{padding:13px 20px;font-size:12px;border-radius:30px}
+.ritual-skip{font-size:12px;color:#7b8572;text-decoration:underline;text-underline-offset:3px;padding:8px 0}
+.ritual-plan{list-style:none;padding:0;margin:20px 0 0;display:grid;gap:10px}
+.ritual-plan li{display:flex;align-items:center;gap:14px;padding:10px;border:1px solid var(--border);border-radius:12px;background:#fff}
+.ritual-plan img{width:52px;height:52px;border-radius:9px;object-fit:cover}
+.ritual-plan small{display:block;font-size:9px;letter-spacing:1.2px;color:#8d9780}
+.ritual-plan strong{font-size:14px;font-weight:600}
+
+/* ------------------------------------------------------------------ */
+/* Cooking mode                                                         */
+/* ------------------------------------------------------------------ */
+.cook-mode{position:fixed;inset:0;width:100vw;height:100dvh;max-width:none;max-height:none;margin:0;padding:0;border:0;background:#17221b;color:#f3efe1}
+.cook-mode::backdrop{background:#17221b}
+.cm-shell{height:100%;display:grid;grid-template-rows:auto auto 1fr auto auto;max-width:1100px;margin:0 auto;padding:max(22px,env(safe-area-inset-top)) 32px max(22px,env(safe-area-inset-bottom))}
+.cm-top{display:flex;justify-content:space-between;align-items:center;gap:16px}
+.cm-kicker{display:block;font-size:10px;letter-spacing:2.2px;color:#b9c4ab}
+.cm-count{display:block;font-family:Georgia,serif;font-size:18px;color:#e2c99a;margin-top:3px}
+.cm-close{width:44px;height:44px;border-radius:50%;border:1px solid #f3efe133;color:#f3efe1;font-size:26px;line-height:1}
+.cm-progress{display:flex;gap:6px;margin:18px 0 0}
+.cm-progress i{flex:1;height:3px;border-radius:3px;background:#f3efe11f}
+.cm-progress i.done{background:#8caa6d}
+.cm-progress i.now{background:#e2c99a}
+.cm-stage{display:flex;align-items:center;min-height:0;overflow:auto;padding:24px 0}
+.cm-step{font-family:Georgia,'Times New Roman',serif;font-size:clamp(28px,4.4vw,54px);line-height:1.22;letter-spacing:-.8px;margin:0;max-width:22em;color:#fffdf1;outline:none}
+.cm-tools{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;justify-content:space-between;padding:16px 0;border-top:1px solid #f3efe11a}
+.cm-timer{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cm-timer button{font-size:13px;color:#f3efe1;border:1px solid #f3efe133;border-radius:24px;padding:9px 15px}
+.cm-timer button:hover{background:#f3efe10f}
+.cm-presets{display:flex;gap:8px}
+.cm-ring{width:46px;height:46px;transform:rotate(-90deg);display:none}
+.cm-ring circle{fill:none;stroke:#f3efe11f;stroke-width:3}
+.cm-ring .cm-ring-fill{stroke:#e2c99a;stroke-dasharray:100;stroke-dashoffset:100;transition:stroke-dashoffset .25s linear}
+.cm-time{font-variant-numeric:tabular-nums;font-size:28px;font-family:Georgia,serif;min-width:0}
+.cm-timer.is-set .cm-ring{display:block}
+.cm-timer.is-set .cm-presets{display:none}
+.cm-timer.is-done .cm-time{color:#e2c99a;animation:cm-pulse 1s ease-in-out 3}
+@keyframes cm-pulse{50%{opacity:.35}}
+.cm-ingredients{font-size:13px;color:#d8dccd;min-width:min(320px,100%)}
+.cm-ingredients summary{cursor:pointer;padding:9px 0;color:#e2c99a;list-style:none}
+.cm-ingredients summary::-webkit-details-marker{display:none}
+.cm-ingredients summary::after{content:' +';}
+.cm-ingredients[open] summary::after{content:' –'}
+.cm-ingredients ul{list-style:none;margin:6px 0 0;padding:0;max-height:30vh;overflow:auto}
+.cm-ingredients li{display:flex;justify-content:space-between;gap:16px;padding:6px 0;border-bottom:1px solid #f3efe114}
+.cm-nav{display:flex;justify-content:space-between;gap:12px;padding-top:14px}
+.cm-nav button{font-size:15px;font-weight:600;border-radius:40px;padding:16px 26px;color:#f3efe1}
+.cm-back{border:1px solid #f3efe133}
+.cm-back:disabled{opacity:.3}
+.cm-next{background:#f3efe1;color:#17221b!important;margin-left:auto}
+.cm-finish{background:#e2c99a}
+body.is-cooking .sprout{display:none}
+
+@media (max-width:700px){
+  .soak-strip{grid-template-columns:1fr;gap:18px;padding:22px 18px}
+  .soak-head h3{font-size:26px}
+  .ritual-body{padding:40px 22px 28px}
+  .ritual-body h2{font-size:32px}
+  .ritual-actions{flex-wrap:wrap}
+  .cm-shell{padding-left:18px;padding-right:18px}
+  .cm-nav button{padding:15px 20px;flex:1}
+  .cm-tools{gap:6px}
+  .win-card{flex-wrap:wrap}
+}
+@media (prefers-reduced-motion:reduce){.cm-ring .cm-ring-fill{transition:none}.cm-timer.is-done .cm-time{animation:none}}
+@media print{.soak-strip,.cook-mode,.ritual-dialog{display:none!important}}

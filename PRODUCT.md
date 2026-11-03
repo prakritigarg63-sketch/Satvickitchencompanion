@@ -38,9 +38,21 @@ The owner's stated longer-term direction is **pantry-first**: start from what is
 - It's used at home around three moments: deciding the week's meals, shopping, and cooking at the stove.
 - Cooking mode is used mid-cook, with a step checklist and "I cooked this!" at the end.
 - The shopping list can be copied to the clipboard or printed for use in the shop.
-- Data stays on the device. There are no accounts, sync or backend.
+- Data stays on the device. There are no accounts or sync. The only backend is the optional Sprout AI function, which receives the chat message and a snapshot of the plan.
 
 ## Capabilities and Constraints
+
+**The satvic layer (Nov 2026):**
+- Seasons follow the six Indian ritus by month (`RITU` in `app.js`). The hero, plan and Sprout name the current one.
+- Each recipe has `moment` (midday or before sunset), `raw`, `ritu` (seasons it suits), an optional `soak` (hours, what, amount) and a `why` line (`SATVIC` in `app.js`).
+- **This week's harvest:** six in-season recipes that fit the preferences, rotating by ISO week ("Harvest no. 45", the next one opens Monday).
+- **Tonight's soak:** a strip on the plan listing what to soak for planned meals, with a "soaked" checkbox (`state.soaked`). In the evening, Sprout nudges once per day on desktop.
+- **Kitchen ritual** (`ritual.js`): three questions on a first visit (name and household, evening time, appetite), then a varied plan built from the answers. It can be skipped; add `?tour=0` to the URL to skip it for screenshots.
+- **Cooking mode** (`cook-mode.js`): full screen and dark, one large step at a time, kitchen timer, ingredient drawer, arrow keys, screen wake lock; finishing runs the normal "I cooked this" flow.
+- Quantities read naturally (½ tsp, 1½ lemons · buy 2, 3 medium carrots).
+- The Cooked page shows this week's three meals with their status, instead of an empty state.
+- `exclusive.css` holds these styles plus one shared photo grade.
+- **Sprout AI:** `api/sprout.js` is a Vercel Function that calls Claude (`claude-opus-5-5` by default, override with `SPROUT_MODEL`). It needs `ANTHROPIC_API_KEY` in the Vercel environment; without it, Sprout falls back to the offline guide. The welcome pop-up was removed.
 
 **Built and working in the prototype:**
 - 14 hand-written illustrative recipes: Golden moong khichdi, Rainbow chickpea bowl, Tomato & basil soup, Garden millet bowl, Coconut vegetable stew, Sesame veggie noodles, Pumpkin & ginger soup, Carrot & cumin soup, Spinach & sweetcorn soup, Cucumber & coconut salad, Beetroot & carrot salad, Vegetable millet upma, Lauki & moong khichdi, Creamy cashew vegetable curry.
@@ -89,13 +101,13 @@ The owner's stated longer-term direction is **pantry-first**: start from what is
   - This disclaimer must stay visible in the page footer and the credits page.
   - Never use Satvic Movement's name as a brand, nor their logos, program names, founders' names, imagery or recipes, and never suggest endorsement.
   - "Satvic" is used only as the general name for the diet.
-- **Voice:** warm, gentle, encouraging and unhurried. Small, everyday framing, as in this shipped copy:
-  - "A little planning. A lot of goodness."
-  - "Your kitchen, a little calmer."
-  - "Goodness grows one meal at a time."
-  - "No perfect streaks needed. Just your next good meal."
+- **Voice (since Nov 2026):** calm, confident and specific. Fewer words, concrete details (season, soak, sunset), no "little" softeners. Shipped examples:
+  - "Three meals. One list. Done by sunset."
+  - "Buy only what you'll cook."
+  - "Cook fresh. Eat early. Repeat."
+  - "No streaks, no scores. Just the meals you actually made."
 
-  Celebrate small wins and never guilt the cook.
+  Never guilt the cook.
 - Recipes and photos are always labelled *illustrative*.
 
 ## Evidence on Hand

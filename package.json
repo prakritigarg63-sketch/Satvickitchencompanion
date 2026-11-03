@@ -1,0 +1,9 @@
+{
+  "name": "satvic-kitchen-companion",
+  "private": true,
+  "type": "module",
+  "description": "Static site in dist/, plus one Vercel Function (api/sprout.js) for Sprout's AI replies.",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.4.0"
+  }
+}

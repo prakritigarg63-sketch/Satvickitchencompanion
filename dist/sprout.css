@@ -56,13 +56,18 @@
 .sprout.is-thinking .sprout-body{animation:sprout-ponder 1.8s ease-in-out infinite}
 @keyframes sprout-ponder{0%,100%{transform:rotate(-1.5deg)}50%{transform:rotate(1.5deg)}}
 
+/* happy: a soft smile in the eyes and perked leaves when Kitchen Calm starts */
+.sprout.is-happy .sprout-eyes{transform:translateY(-1.2%) scaleY(.86)}
+.sprout.is-happy .sprout-layer-leaves{animation:sprout-perk 1.6s ease-in-out 1}
+.sprout.is-happy .sprout-art{animation:sprout-hello .6s ease-out 1}
+
 /* celebrating: one short, happy bounce */
 .sprout.is-celebrating .sprout-art{animation:sprout-bounce .9s cubic-bezier(.3,1.4,.5,1) 1}
 .sprout.is-celebrating .sprout-layer-arm{animation:sprout-wave 1.2s ease-in-out 1}
 @keyframes sprout-bounce{0%,100%{transform:translateY(0) scale(1)}20%{transform:translateY(0) scale(1.06,.94)}45%{transform:translateY(-16px) scale(.97,1.04)}70%{transform:translateY(0) scale(1.03,.97)}85%{transform:translateY(-4px)}}
 
 /* ---------- welcome bubble ---------- */
-.sprout-bubble{position:relative;width:min(270px,calc(100vw - 32px));margin-bottom:12px;padding:16px 16px 14px;background:var(--paper);color:var(--ink);border:1px solid var(--border);border-radius:16px 16px 4px 16px;box-shadow:0 12px 32px rgba(40,60,48,.16);animation:sprout-pop .35s cubic-bezier(.2,.8,.2,1)}
+.sprout-bubble{transition:translate .25s cubic-bezier(.2,.8,.2,1);position:relative;width:min(270px,calc(100vw - 32px));margin-bottom:12px;padding:16px 16px 14px;background:var(--paper);color:var(--ink);border:1px solid var(--border);border-radius:16px 16px 4px 16px;box-shadow:0 12px 32px rgba(40,60,48,.16);animation:sprout-pop .35s cubic-bezier(.2,.8,.2,1)}
 .sprout-bubble[hidden]{display:none}
 .sprout-bubble p{margin:0 28px 12px 0;font-size:15px;line-height:1.5}
 .sprout-bubble-actions{display:flex;gap:8px;flex-wrap:wrap}

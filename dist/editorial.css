@@ -216,5 +216,9 @@ body.has-masthead .brand-ink--light{clip-path:inset(0 0 calc(100% - var(--brand-
 body.has-masthead .brand-ink--dark{display:flex;clip-path:inset(var(--brand-cut,9999px) 0 0 0)}
 
 body.masthead-instant .brand,body.masthead-instant .brand-move{transition:none!important}
+/* Only the visible logo catches clicks: the link's own box moves sideways with the large logo and
+   would otherwise sit invisibly over the header buttons. */
+body.has-masthead .brand{pointer-events:none}
+body.has-masthead .brand-ink{pointer-events:auto}
 @media(prefers-reduced-motion:reduce){.brand,.brand-move{transition:none!important}}
 @media print{.masthead-space{display:none}}

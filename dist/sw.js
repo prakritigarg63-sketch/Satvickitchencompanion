@@ -1,9 +1,10 @@
 // Satvic Kitchen Companion: offline support.
 // Bump VERSION whenever the precache list changes; old caches are cleared on activate.
-const VERSION = 'satvic-v4';
+const VERSION = 'satvic-v6';
 const SHELL = [
-  './', 'index.html', 'style.css', 'editorial.css', 'sprout.css', 'cursor.css', 'app.js', 'masthead.js', 'sprout.js', 'credits.html', 'manifest.webmanifest',
+  './', 'index.html', 'style.css', 'editorial.css', 'sprout.css', 'sounds.css', 'cursor.css', 'exclusive.css', 'app.js', 'cook-mode.js', 'ritual.js', 'masthead.js', 'sprout.js', 'sounds.js', 'credits.html', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png',
+  'assets/bird/white-eye.png',
   'assets/cursor/leaf-cursor.png', 'assets/cursor/leaf-cursor@2x.png',
   'assets/sprout/body.png', 'assets/sprout/arm.png', 'assets/sprout/leaves.png', 'assets/sprout/eye-left.png', 'assets/sprout/eye-right.png', 'assets/sprout/full.png',
   // The hero and the default three meals, so the first screen works offline right away.
@@ -59,6 +60,8 @@ self.addEventListener('fetch', event => {
   const url = new URL(request.url);
 
   if (url.origin === location.origin) {
+    // Audio is streamed with range requests; let the browser handle it directly (a cached whole file breaks Safari playback).
+    if (url.pathname.includes('/assets/sounds/')) return;
     // Photos rarely change: serve from cache, and keep each one the first time it is seen.
     if (url.pathname.includes('/assets/') || url.pathname.includes('/icons/')) event.respondWith(cacheFirst(request));
     // Pages, styles and scripts: always try for the latest, fall back to the saved copy offline.

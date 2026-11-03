@@ -2,3 +2,4 @@
 .impeccable/
 .env*
 .qa/
+node_modules/

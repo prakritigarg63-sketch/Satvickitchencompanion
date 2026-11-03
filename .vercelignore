@@ -1,4 +1,7 @@
-# Only the static site is deployed; keep env files, screenshots and QA tooling out of the upload.
+# Only the static site and Sprout's function are deployed; keep env files, screenshots and QA tooling out of the upload.
 /*
 !dist
+!api
+!package.json
+!package-lock.json
 !vercel.json
