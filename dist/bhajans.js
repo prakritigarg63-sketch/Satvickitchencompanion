@@ -255,7 +255,9 @@
     SatvicAudio._claim('bhajans');
     applyVolume();
     const cur = player.getVideoData?.()?.video_id;
-    if (cur !== prefs.track) player.loadVideoById(prefs.track); else player.playVideo();
+    if (cur !== prefs.track) player.loadVideoById(prefs.track);
+    else if (player.getPlayerState?.() === window.YT?.PlayerState?.PLAYING) { wantPlay = false; setStatus('playing'); return; }   // already playing
+    else player.playVideo();
     if (!auto) {
       // Some browsers (iPhone Safari) only start an embedded video from a tap on the video itself.
       clearTimeout(autoTimer);
