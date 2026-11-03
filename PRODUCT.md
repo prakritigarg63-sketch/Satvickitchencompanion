@@ -8,7 +8,7 @@ web
 
 ## Stack
 
-Static HTML, CSS and vanilla JavaScript with no framework and no build step. The prototype lives in `dist/`: `index.html`, `style.css`, `app.js`, `credits.html` and `assets/`. Fonts load from Google Fonts. All state is kept in the browser's `localStorage` under the key `satvic-kitchen-concept-v1`.
+Static HTML, CSS and vanilla JavaScript with no framework and no build step. The prototype lives in `dist/`: `index.html`, `style.css` (base), `editorial.css` (the editorial layout and a readability layer, loaded after the base), `app.js`, `credits.html` and `assets/`. Fonts load from Google Fonts. All state is kept in the browser's `localStorage` under the key `satvic-kitchen-concept-v1`.
 
 The owner earlier named React / Next.js for the product. The shipped prototype is vanilla, and moving to a framework is an **open decision**, not a plan.
 
@@ -43,7 +43,7 @@ The owner's stated longer-term direction is **pantry-first**: start from what is
 ## Capabilities and Constraints
 
 **Built and working in the prototype:**
-- 6 hand-written illustrative recipes: Golden moong khichdi, Rainbow chickpea bowl, Tomato & basil soup, Garden millet bowl, Coconut vegetable stew, Sesame veggie noodles.
+- 14 hand-written illustrative recipes: Golden moong khichdi, Rainbow chickpea bowl, Tomato & basil soup, Garden millet bowl, Coconut vegetable stew, Sesame veggie noodles, Pumpkin & ginger soup, Carrot & cumin soup, Spinach & sweetcorn soup, Cucumber & coconut salad, Beetroot & carrot salad, Vegetable millet upma, Lauki & moong khichdi, Creamy cashew vegetable curry.
   - Each recipe has its own ingredients, prep note and four steps.
   - Recipes are categorised as *Quick & fresh* or *Comfort bowls*.
 - Default plan: khichdi, chickpea bowl, tomato soup.
@@ -58,7 +58,7 @@ The owner's stated longer-term direction is **pantry-first**: start from what is
 - Shopping:
   - "To buy" and "In my pantry" tabs, each item with a Have it / Need it toggle.
   - Checkboxes for items bought.
-  - The remaining-item count shows both on the page and in the sidebar badge.
+  - The remaining-item count shows both on the page and in the header navigation badge.
 - Small wins keeps all-time cooked recipes separate from progress through the current plan. Per-recipe feedback options: Easy & enjoyable / Took longer / Missing ingredients.
 - Reset demo restores the default state.
 
@@ -79,7 +79,7 @@ The owner's stated longer-term direction is **pantry-first**: start from what is
 
 - Name: **Satvic Kitchen Companion**. Wordmark "satvic" with the subtitle "KITCHEN COMPANION".
 - **Independent portfolio concept, imagined and built by Prakriti Garg. Unaffiliated with Satvic Movement.**
-  - This disclaimer must stay visible in the sidebar footer, the page footer and the credits page.
+  - This disclaimer must stay visible in the page footer and the credits page.
   - Never use Satvic Movement's name as a brand, nor their logos, program names, founders' names, imagery or recipes, and never suggest endorsement.
   - "Satvic" is used only as the general name for the diet.
 - **Voice:** warm, gentle, encouraging and unhurried. Small, everyday framing, as in this shipped copy:
@@ -93,13 +93,14 @@ The owner's stated longer-term direction is **pantry-first**: start from what is
 
 ## Evidence on Hand
 
-- Six illustrative recipes in `dist/app.js`. They are independent examples, not official Satvic Movement recipes.
-- Seven photos in `dist/assets/`, credited in `dist/credits.html`:
+- Fourteen illustrative recipes in `dist/app.js`. They are independent examples, not official Satvic Movement recipes.
+- Fifteen photos in `dist/assets/`, credited in `dist/credits.html`:
   - Unsplash: the vegetable bowls (`hero.jpg` and `chickpea.jpg` are the same image) and the tomato soup.
   - Food Trails: khichdi.
   - Eat-Vegan: vegetable stew.
   - Culinary Vegans: noodles.
-  - **The reuse rights for the three food-blog photos are unconfirmed**; crediting a photo doesn't grant them. Confirm permission or replace them before using them more widely.
+  - Eight more for the expanded collection (pumpkin soup, carrot soup, spinach & corn soup, cucumber salad, beetroot salad, millet upma, lauki khichdi, cashew curry), from the food sites listed on the credits page.
+  - **The reuse rights for the food-blog and food-site photos are unconfirmed**; crediting a photo doesn't grant them. Confirm permission or replace them before using them more widely.
 - Reference screenshot: `preview.jpg`.
 - Live prototype: https://satvic-kitchen-companion-prakriti.prakritigarg194.chatgpt.site
 - There are no real users, testimonials, usage data, nutrition data, health outcomes or expert review. Never invent any of these.

@@ -2,33 +2,34 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f7f6f0"><meta name="description" content="A calmer way to plan, shop, and cook. An independent Satvic Kitchen Companion concept by Prakriti Garg.">
+  <meta name="theme-color" content="#3c5d43"><meta name="description" content="A calmer way to plan, shop, and cook. An independent Satvic Kitchen Companion concept by Prakriti Garg.">
   <title>Satvic Kitchen Companion · A little planning. A lot of goodness.</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22%3E%3Crect width=%2240%22 height=%2240%22 rx=%2210%22 fill=%22%233c5d43%22/%3E%3Cpath d=%22M20 31C5 29 4 13 7 7c11-1 19 7 13 24Zm0 0C18 14 27 7 36 9c0 13-6 20-16 22Z%22 fill=%22none%22 stroke=%22%23f7f6f0%22 stroke-width=%222%22/%3E%3C/svg%3E">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="editorial.css">
 </head>
 <body>
+  <a class="skip-link" href="#content">Skip to main content</a>
   <div class="app-shell">
-    <aside class="sidebar">
-      <a class="brand" href="#plan" aria-label="Kitchen Companion home"><span class="brand-icon" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M20 31C5 29 4 13 7 7c11-1 19 7 13 24Zm0 0C18 14 27 7 36 9c0 13-6 20-16 22Z"/><path d="M12 14c5 5 7 10 8 19m10-17c-5 5-8 11-10 17"/></svg></span><span><b>satvic</b><small>KITCHEN COMPANION</small></span></a>
-      <p class="nav-caption">YOUR LITTLE KITCHEN</p>
-      <nav aria-label="Main navigation">
+    <header class="sidebar">
+      <a class="brand" href="#plan" aria-label="Satvic Kitchen Companion, back to my meal plan"><span class="brand-icon" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M20 31C5 29 4 13 7 7c11-1 19 7 13 24Zm0 0C18 14 27 7 36 9c0 13-6 20-16 22Z"/><path d="M12 14c5 5 7 10 8 19m10-17c-5 5-8 11-10 17"/></svg></span><span><b>satvic</b><small>KITCHEN COMPANION</small></span></a>
+      <nav id="kitchen-navigation" aria-label="Main navigation">
         <button data-view="plan" class="nav-item active"><span data-icon="calendar"></span>My meal plan<span class="nav-dot"></span></button>
         <button data-view="recipes" class="nav-item"><span data-icon="book"></span>Explore recipes</button>
         <button data-view="shopping" class="nav-item"><span data-icon="bag"></span>Shopping list<span id="nav-list-count" class="nav-count"></span></button>
         <button data-view="progress" class="nav-item"><span data-icon="sprout"></span>My small wins</button>
       </nav>
-      <div class="sidebar-tip"><span data-icon="sun"></span><h3>Goodness grows<br>one meal at a time.</h3><p>A little preparation today.<br>A calmer kitchen tomorrow.</p><div class="tip-sprout" aria-hidden="true">✳</div></div>
-      <div class="sidebar-foot"><span class="concept-pill">INDEPENDENT CONCEPT</span><p>Imagined & built by<br><strong>Prakriti Garg</strong></p><button id="reset-demo">Reset demo</button></div>
-    </aside>
+      <div class="header-tools"><button class="preferences-button" id="open-preferences" aria-haspopup="dialog"><span data-icon="sliders"></span><span class="sr-only">Cooking preferences: </span><span id="preferences-summary">2 people · 30 min</span></button><button class="icon-button mobile-menu" id="mobile-menu" aria-label="Menu" aria-controls="kitchen-navigation" aria-expanded="false"><span data-icon="menu"></span></button></div>
+    </header>
     <main>
-      <header class="topbar"><div><span class="eyebrow">A LITTLE EVERYDAY NOURISHMENT</span><p id="page-greeting">Your kitchen, a little calmer.</p></div><div class="top-actions"><button class="icon-button mobile-menu" id="mobile-menu" aria-label="Toggle navigation"><span data-icon="menu"></span></button><button class="preferences-button" id="open-preferences"><span data-icon="sliders"></span><span id="preferences-summary">2 people · 30 min</span></button><div class="avatar" aria-label="Your kitchen profile">P</div></div></header>
-      <div class="content" id="content"></div>
-      <footer class="page-footer"><span>Made for real kitchens. And real life.</span><span>Illustrative recipes · Independent concept, unaffiliated with Satvic Movement · <a href="credits.html">Photo credits</a></span></footer>
+      <div class="topbar"><div><span class="eyebrow">A LITTLE EVERYDAY NOURISHMENT</span><p id="page-greeting">Your kitchen, a little calmer.</p></div><div class="avatar" role="img" aria-label="Your kitchen profile">P</div></div>
+      <div class="content" id="content" tabindex="-1"></div>
     </main>
+    <footer class="page-footer"><div class="footer-invitation"><span class="eyebrow">THE SATVIC KITCHEN COMPANION</span><h2>Goodness grows.<br><em>One meal at a time.</em></h2><button class="footer-cta" data-view="plan">Back to my little plan <span data-icon="arrow"></span></button></div><div class="footer-bottom"><div><span class="footer-wordmark">satvic</span><p>Made for real kitchens.<br>And real life.</p></div><nav class="footer-links" aria-label="Kitchen shortcuts"><button data-view="plan">My meal plan</button><button data-view="recipes">Recipes</button><button data-view="shopping">Shopping list</button><button data-view="progress">Small wins</button></nav><div class="footer-attribution"><p>Imagined &amp; built by Prakriti Garg</p><button id="reset-demo">Reset demo</button><a href="credits.html">Photo credits</a></div></div><p class="footer-disclaimer"><span class="concept-pill">INDEPENDENT CONCEPT</span> Illustrative recipes and photography. Independent concept, unaffiliated with Satvic Movement.</p></footer>
   </div>
-  <dialog id="preferences-dialog" class="small-dialog"><form id="preferences-form"><button type="button" class="dialog-close icon-button" data-close="preferences-dialog" aria-label="Close preferences">×</button><span class="eyebrow">LET’S MAKE IT YOURS</span><h2>A plan that fits<br>your everyday.</h2><p class="muted">A few simple preferences for your kitchen.</p><label for="servings">How many people are you cooking for?</label><div class="stepper"><button type="button" id="servings-down" aria-label="Fewer people">−</button><input id="servings" type="number" min="1" max="8" value="2"><button type="button" id="servings-up" aria-label="More people">+</button><span>people</span></div><label for="cooking-time">Time available for each meal</label><select id="cooking-time"><option value="20">Up to 20 minutes</option><option value="30">Up to 30 minutes</option><option value="45">Up to 45 minutes</option></select><p class="form-help">Active cooking time. Preparation, such as soaking, is shown separately.</p><label class="check-label"><input type="checkbox" id="nut-free">Show recipes without nuts</label><button class="button primary full" type="submit">Save my preferences <span data-icon="arrow"></span></button><p class="form-help">Changes apply to recipe suggestions. Your chosen meals stay in your plan.</p></form></dialog>
-  <dialog id="recipe-dialog" class="recipe-dialog"></dialog>
-  <dialog id="swap-dialog" class="small-dialog"></dialog>
+  <dialog id="preferences-dialog" class="small-dialog" aria-labelledby="preferences-title"><form id="preferences-form"><button type="button" class="dialog-close icon-button" data-close="preferences-dialog" aria-label="Close preferences">×</button><span class="eyebrow">LET’S MAKE IT YOURS</span><h2 id="preferences-title">A plan that fits<br>your everyday.</h2><p class="muted">A few simple preferences for your kitchen.</p><label for="servings">How many people are you cooking for?</label><div class="stepper"><button type="button" id="servings-down" aria-label="Fewer people">−</button><input id="servings" type="number" min="1" max="8" value="2" inputmode="numeric"><button type="button" id="servings-up" aria-label="More people">+</button><span aria-hidden="true">people</span></div><label for="cooking-time">Time available for each meal</label><select id="cooking-time" aria-describedby="time-help"><option value="20">Up to 20 minutes</option><option value="30">Up to 30 minutes</option><option value="45">Up to 45 minutes</option></select><p class="form-help" id="time-help">Active cooking time. Preparation, such as soaking, is shown separately.</p><label class="check-label"><input type="checkbox" id="nut-free">Show recipes without nuts</label><button class="button primary full" type="submit">Save my preferences <span data-icon="arrow"></span></button><p class="form-help">Changes apply to recipe suggestions. Your chosen meals stay in your plan.</p></form></dialog>
+  <dialog id="recipe-dialog" class="recipe-dialog" aria-label="Recipe"></dialog>
+  <dialog id="swap-dialog" class="small-dialog" aria-label="Choose a meal"></dialog>
   <div id="toast" role="status" aria-live="polite"></div>
   <script src="app.js"></script>
 </body>
