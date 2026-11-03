@@ -1,0 +1,77 @@
+/* Sprout's voice controls: microphone, Idle/Listening/Thinking/Speaking status, read-aloud switch,
+   voice settings, and gentle mascot motion while listening or speaking. Uses the app's tokens. */
+
+/* Microphone, inside the compose row (overrides the green Send pill style) */
+.sprout-compose .sv-mic{position:relative;display:grid;place-items:center;width:44px;height:44px;padding:0;border-radius:50%;background:#eef1e6;color:var(--green);border:1px solid #d6ddcc;flex-shrink:0;transition:background .2s,color .2s,border-color .2s}
+.sprout-compose .sv-mic[hidden]{display:none}
+.sprout-compose .sv-mic svg{width:21px;height:21px}
+.sprout-compose .sv-mic:hover{background:#e4ead9}
+.sprout-compose .sv-mic:focus-visible{outline:3px solid #d29158;outline-offset:2px}
+.sprout-compose .sv-mic.is-on{background:#b5532f;border-color:#b5532f;color:#fffefa}
+.sprout-compose .sv-mic.is-on::after{content:'';position:absolute;inset:-5px;border-radius:50%;border:2px solid #b5532f66;animation:sv-ring 1.4s ease-out infinite}
+@keyframes sv-ring{from{transform:scale(.92);opacity:1}to{transform:scale(1.25);opacity:0}}
+
+/* Voice bar above the compose row */
+.sv-wrap{border-top:1px solid var(--border);background:#f7f6ee}
+.sprout-panel.is-minimised .sv-wrap{display:none}
+.sv-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 10px 7px 14px;min-height:44px}
+.sv-status{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap}
+.sv-status i{width:8px;height:8px;border-radius:50%;background:#b9c1ad;flex-shrink:0}
+.sv-status[data-state=listening]{color:#9c4426}
+.sv-status[data-state=listening] i{background:#b5532f;animation:sv-blink 1s ease-in-out infinite}
+.sv-status[data-state=thinking]{color:#8a6a2c}
+.sv-status[data-state=thinking] i{background:#d29158;animation:sv-blink 1.4s ease-in-out infinite}
+.sv-status[data-state=speaking]{color:var(--green)}
+.sv-status[data-state=speaking] i{background:var(--green);animation:sv-blink .8s ease-in-out infinite}
+@keyframes sv-blink{50%{opacity:.35}}
+.sv-tools{display:flex;align-items:center;gap:4px;min-width:0}
+.sv-tools button{display:inline-flex;white-space:nowrap;align-items:center;gap:6px;min-height:34px;border-radius:18px;font-size:12px;font-weight:600;color:var(--ink)}
+.sv-tools button[hidden]{display:none}
+.sv-tools button:focus-visible{outline:3px solid #d29158;outline-offset:1px}
+.sv-tools button:disabled{opacity:.4;cursor:default}
+.sv-icon{justify-content:center;width:34px;padding:0;color:var(--green)!important}
+.sv-icon:not(:disabled):hover,.sv-read:hover{background:#ebeee2}
+.sv-icon svg{width:17px;height:17px}
+.sv-stop{padding:0 12px;background:var(--green);color:#fffefa!important}
+.sv-stop svg{width:14px;height:14px}
+.sv-read{padding:0 8px}
+.sv-switch{position:relative;width:30px;height:18px;border-radius:10px;background:#cfd6c4;transition:background .2s;flex-shrink:0}
+.sv-switch::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 1px 2px #0003;transition:transform .2s}
+.sv-read[aria-checked=true] .sv-switch{background:var(--green)}
+.sv-read[aria-checked=true] .sv-switch::after{transform:translateX(12px)}
+
+/* Settings */
+.sv-settings{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;padding:4px 14px 12px}
+.sv-settings[hidden]{display:none}
+.sv-field{display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:600;color:var(--muted);min-width:0}
+.sv-field select{width:100%;font-size:13px;padding:7px 8px;border:1px solid #d6ddcc;border-radius:9px;background:#fdfcf6;color:var(--ink)}
+.sv-field select:disabled{opacity:.6}
+.sv-rate-field{grid-column:1/-1}
+.sv-rate-field span{display:flex;justify-content:space-between}
+.sv-rate-field output{font-variant-numeric:tabular-nums;color:var(--ink)}
+.sv-rate{width:100%;accent-color:var(--green)}
+.sv-help{grid-column:1/-1;margin:0;font-size:11px;line-height:1.55;color:var(--muted)}
+.sv-notice{margin:0;padding:0 14px 8px;font-size:12px;line-height:1.5;color:#7a5a24}
+.sv-notice[hidden]{display:none}
+
+/* Sprout moves gently while it listens or speaks */
+.sprout.is-listening .sprout-body{animation:sv-listen 1.8s ease-in-out infinite}
+.sprout.is-listening .sprout-layer-leaves{animation:sprout-perk 1.8s ease-in-out infinite}
+@keyframes sv-listen{0%,100%{transform:scale(1)}50%{transform:scale(1.035) translateY(-1.5%)}}
+.sprout.is-speaking .sprout-body{animation:sv-speak .9s ease-in-out infinite}
+@keyframes sv-speak{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(-2.5%) rotate(-1.2deg)}70%{transform:translateY(-1%) rotate(1deg)}}
+.sprout.is-listening .sprout-avatar img{animation:sv-listen 1.8s ease-in-out infinite}
+.sprout.is-speaking .sprout-avatar img{animation:sv-speak .9s ease-in-out infinite}
+
+@media(max-width:700px){
+  .sv-bar{padding:6px 8px 6px 12px}
+  .sv-read span:last-child{font-size:11.5px}
+  .sv-settings{gap:8px 10px;padding:2px 12px 10px}
+  .sv-help{font-size:10.5px;line-height:1.45}
+}
+@media(max-width:360px){.sv-status-text{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}}
+@media(prefers-reduced-motion:reduce){
+  .sprout.is-listening .sprout-body,.sprout.is-speaking .sprout-body,.sprout.is-listening .sprout-layer-leaves,
+  .sprout.is-listening .sprout-avatar img,.sprout.is-speaking .sprout-avatar img,.sv-status i,.sprout-compose .sv-mic.is-on::after{animation:none}
+}
+@media(forced-colors:active){.sv-switch{border:1px solid CanvasText}.sv-read[aria-checked=true] .sv-switch{background:Highlight}}

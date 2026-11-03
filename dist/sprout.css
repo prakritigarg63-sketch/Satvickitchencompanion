@@ -1,7 +1,7 @@
 /* Sprout — the kitchen companion mascot and chat panel.
    Uses the app's tokens (--green, --paper, --pale, --peach, --ink, --muted, --border). */
 
-.sprout{--sprout-w:90px;--sprout-gap:20px;position:fixed;right:max(var(--sprout-gap),env(safe-area-inset-right,0px));bottom:calc(var(--sprout-gap) + env(safe-area-inset-bottom,0px));z-index:40;width:var(--sprout-w);display:flex;flex-direction:column;align-items:flex-end;pointer-events:none}
+.sprout{--sprout-w:120px;--sprout-gap:20px;position:fixed;right:max(var(--sprout-gap),env(safe-area-inset-right,0px));bottom:calc(var(--sprout-gap) + env(safe-area-inset-bottom,0px));z-index:40;width:var(--sprout-w);display:flex;flex-direction:column;align-items:flex-end;pointer-events:none}
 .sprout[hidden]{display:none}
 .sprout>*{pointer-events:auto}
 
@@ -142,7 +142,7 @@
 
 /* ---------- small screens ---------- */
 @media(max-width:700px){
-  .sprout{--sprout-w:65px;--sprout-gap:14px}
+  .sprout{--sprout-w:84px;--sprout-gap:14px}
   .sprout-panel{position:fixed;left:max(10px,env(safe-area-inset-left,0px));right:max(10px,env(safe-area-inset-right,0px));bottom:calc(var(--sprout-w) + 26px + env(safe-area-inset-bottom,0px) + var(--sprout-kb,0px));width:auto;height:calc(100dvh - var(--sprout-w) - 40px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - var(--sprout-kb,0px));max-height:640px;margin:0}
   .sprout-bubble{margin-bottom:10px}
   .sprout-compose input{font-size:16px}
@@ -158,3 +158,16 @@
   .sprout *,.sprout *::before{animation:none!important;transition:none!important}
   .sprout.is-chatting .sprout-eyes,.sprout.is-thinking .sprout-eyes{transform:none}
 }
+
+/* ---------- greeting on load: hello + "how are you feeling?" ---------- */
+.sprout-bubble p.sprout-greet{margin-bottom:6px}
+.sprout-greet strong{display:block;font-family:Georgia,'Times New Roman',serif;font-weight:400;font-size:19px;letter-spacing:-.3px;margin-bottom:2px}
+.sprout-bubble p.sprout-greet-ask{margin-bottom:10px;font-size:13px;color:var(--muted)}
+.sprout-moods{display:flex;flex-direction:column;gap:6px}
+.sprout-moods button{display:flex;align-items:center;gap:8px;width:100%;min-height:40px;padding:8px 12px;border:1px solid #d6ddcc;border-radius:12px;background:#fdfcf6;color:var(--ink);font-size:14px;font-weight:600;text-align:left;transition:background .15s,border-color .15s,transform .15s}
+.sprout-moods button span{font-size:17px}
+.sprout-moods button:focus-visible,.sprout-greet-chat:focus-visible{outline:3px solid #d29158;outline-offset:2px}
+@media(hover:hover) and (pointer:fine){.sprout-moods button:hover{background:#eef1e6;border-color:#a9bb94;transform:translateX(2px)}}
+.sprout-moods button:active{transform:scale(.98)}
+.sprout-greet-chat{margin-top:10px;padding:6px 0;font-size:13px;font-weight:600;color:var(--green);text-decoration:underline;text-underline-offset:3px}
+@media(prefers-reduced-motion:reduce){.sprout-moods button{transition:none}.sprout-moods button:hover{transform:none}}

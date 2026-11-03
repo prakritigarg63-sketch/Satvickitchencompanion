@@ -85,6 +85,27 @@ The owner's stated longer-term direction is **pantry-first**: start from what is
 - *Cook this*, *Swap*, *Refresh my plan*, *Make shopping simple*
 - *Have it / Need it*, *I cooked this!*
 
+**Krishna Bhajans (Nov 2026):** `dist/bhajans.js` and `bhajans.css`. The white-eye bird in the nav is the control.
+- **Source.** Ten Hindi and Braj bhajans are streamed from YouTube through the official IFrame Player API (youtube-nocookie.com). Nothing is downloaded or hosted. Each video is an embeddable upload on its channel; the list, channels and links are in `credits.html#bhajans`.
+- **Rights.** Self-hosted, openly licensed recordings of these bhajans couldn't be verified (Nov 2026 research), so streaming from YouTube is the chosen route.
+- **YouTube's rules.** No background or audio-only playback, and the player must stay visible at 200 × 200 px or larger. So the player is always on screen while it plays: in the panel, or as a 200 × 200 tile bottom-left when minimised. The tile is a popover in the top layer, re-raised above the site's own dialogs. "Stop & close" is the only way to hide it.
+- **Load.** If the browser allows sound without a tap and the cook hasn't stopped or muted it, the saved bhajan plays at the saved volume (15% at first). Otherwise a bubble by the bird says "Welcome 🌿 Tap the bird to play Krishna bhajans." There is one attempt and no retry loop. A video whose channel blocks embedding (error 101/150) is marked "Unavailable here" and skipped once.
+- **Shared controller.** `window.SatvicAudio` stops Kitchen Calm when a bhajan starts and vice versa. Sprout's voice pauses music while listening and lowers it while speaking, then restores it unless the cook stopped it.
+- **Saved settings.** Kept under `satvic-bhajans-v1`: track, volume, mute, repeat (track or playlist), and whether it was stopped.
+- **QA switches.** `?tour=0` skips the autoplay (add `&bhajans=1` to test it). `?bhajans=0` turns the player off so the bird stays Kitchen Calm's. Tests: `.qa/bhajans/test.mjs`.
+
+**Sprout's greeting (Nov 2026):** on every load or refresh, Sprout waves and says "Hi, I'm Sprout 🌱 Hope you are doing well." It asks how the cook is feeling (Doing well / A bit tired / Hungry!) and answers from the real plan: the next meal, or the quickest one when tired, with a button to open it. It waits for the first-visit setup questions, never shows over an open chat, a dialog or a hidden Sprout, and comes before the evening soak reminder. `?tour=0` skips it for screenshots and QA; add `&greet=1` to test it.
+
+**Sprout's voice (Nov 2026):** `dist/sprout-voice.js` and `sprout-voice.css`.
+- **Talk to Sprout.** A microphone in the chat uses the browser's speech recognition. The microphone is requested only on that tap: tap to start, tap again to stop. The transcript lands in the text box to review or edit; nothing is sent automatically.
+- **Read replies aloud.** An optional switch uses the browser's speech synthesis, with Stop and Replay. Voice settings (language, voice, speed) are kept on the device under `satvic-sprout-voice-v1`.
+- **Status.** Idle, Listening, Thinking and Speaking show in the chat, and Sprout moves gently while listening or speaking (none with reduced motion).
+- **Kitchen Calm.** Music is lowered while Sprout listens or speaks (`KitchenCalm.duck`, not saved) and restored afterwards. Listening stops before Sprout speaks.
+- **Languages.** English (India, US, UK) and Hindi. Hindi answers need the AI replies; the offline guide answers in English. Without a Hindi voice, Hindi text is shown but not spoken.
+- **Fallbacks.** Without recognition the microphone is hidden and typing works as before. Errors (denied microphone, silence, offline, unsupported language) show plain messages.
+- **Offline.** Speech recognition is an online browser service in most browsers; never claim it works offline.
+- **Tests.** `.qa/voice/test.mjs` (scripted speech stand-ins) and `.qa/voice/real.mjs` (real browser APIs).
+
 **Open decisions:**
 - whether and when to move to React / Next.js
 - whether recipes stay hand-written or become AI-generated (the owner's earlier direction)

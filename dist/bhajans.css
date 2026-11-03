@@ -1,0 +1,93 @@
+/* Krishna Bhajans player (bhajans.js). The YouTube player must stay visible at 200 × 200 px or more while
+   it plays, so the panel and the minimised tile both keep it on screen. Uses the app's tokens. */
+
+.bj-root{position:fixed;inset:auto;margin:0;padding:0;border:0;background:transparent;color:var(--ink);overflow:visible;z-index:70}
+.bj-root[hidden]{display:none}
+.bj-root:not(.is-open):not(.is-mini){display:none}
+.bj-card{display:flex;flex-direction:column;background:var(--paper);border:1px solid var(--border);border-radius:18px;box-shadow:0 18px 50px #1d2a2133;overflow:hidden}
+
+/* Open: a compact panel under the bird */
+.bj-root.is-open{top:152px;right:max(16px,calc((100vw - 1780px) / 2 + 16px));width:min(360px,calc(100vw - 24px))}
+.bj-root.is-open .bj-card{max-height:calc(100dvh - 170px);overflow:auto;overscroll-behavior:contain}
+.bj-root.is-open .bj-minibar{display:none}
+
+.bj-head{display:flex;align-items:center;gap:6px;padding:12px 10px 10px 16px;background:var(--green);color:#fffdf1;position:sticky;top:0;z-index:1}
+.bj-head h2{flex:1;margin:0;font-family:Georgia,'Times New Roman',serif;font-weight:400;font-size:20px;letter-spacing:-.3px;outline:none}
+.bj-head .bj-icon{color:#fffdf1}
+.bj-head .bj-icon:hover{background:#ffffff1f}
+.bj-stopclose{min-height:34px;padding:0 12px;border-radius:18px;border:1px solid #ffffff59;color:#fffdf1;font-size:12px;font-weight:600;white-space:nowrap}
+.bj-stopclose:hover{background:#ffffff1f}
+
+.bj-video{position:relative;width:100%;height:200px;background:#111;flex-shrink:0}
+.bj-video iframe,#bj-yt{display:block;width:100%;height:100%;border:0}
+.bj-video-msg{position:absolute;inset:0;display:grid;place-items:center;margin:0;padding:18px;text-align:center;font-size:13px;line-height:1.5;color:#f3efe1;background:#1d2a21}
+.bj-video-msg[hidden]{display:none}
+
+.bj-hint{margin:0;padding:8px 16px 0;font-size:12px;font-weight:600;color:#7a5a24}
+.bj-hint[hidden]{display:none}
+.bj-now{display:flex;flex-direction:column;gap:2px;padding:12px 16px 4px}
+.bj-now-title{font-size:15px;font-weight:700}
+.bj-now-by{font-size:12px;color:var(--muted)}
+.bj-controls{display:flex;align-items:center;gap:6px;padding:8px 12px 4px}
+.bj-play{display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:var(--green);color:#fffdf1;flex-shrink:0}
+.bj-play svg{width:20px;height:20px}
+.bj-icon{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;color:var(--green);flex-shrink:0}
+.bj-icon svg{width:18px;height:18px}
+.bj-icon:hover{background:#eef1e6}
+.bj-vol{display:flex;align-items:center;gap:4px;margin-left:auto;min-width:0}
+.bj-vol input{width:96px;accent-color:var(--green)}
+.bj-repeat{display:flex;gap:8px;padding:4px 16px 10px}
+.bj-repeat button{display:inline-flex;align-items:center;gap:6px;min-height:34px;padding:0 12px;border:1px solid #d6ddcc;border-radius:18px;font-size:12px;font-weight:600;color:var(--ink);background:#fdfcf6}
+.bj-repeat button svg{width:15px;height:15px}
+.bj-repeat button[aria-pressed=true]{background:var(--green);border-color:var(--green);color:#fffdf1}
+
+.bj-list{list-style:none;margin:0;padding:4px 8px 6px;border-top:1px solid var(--border)}
+.bj-track{display:flex;align-items:center;gap:10px;width:100%;padding:9px 8px;border-radius:10px;text-align:left;color:var(--ink)}
+.bj-track:hover{background:#f1f3ea}
+.bj-track.is-selected{background:#eaf0e1}
+.bj-track.is-off{opacity:.5}
+.bj-num{width:22px;flex-shrink:0;font-size:11px;font-variant-numeric:tabular-nums;color:var(--muted);text-align:center}
+.bj-track-text{flex:1;min-width:0}
+.bj-track-text strong{display:block;font-size:13px;font-weight:600;line-height:1.35}
+.bj-track-text small{display:block;font-size:11px;color:var(--muted);margin-top:1px}
+.bj-track-text a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.bj-track em{font-style:normal;font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--green);flex-shrink:0}
+.bj-eq{display:inline-flex;align-items:flex-end;gap:2px;height:12px}
+.bj-eq b{width:3px;height:100%;border-radius:2px;background:var(--green);animation:bj-eq 1s ease-in-out infinite}
+.bj-eq b:nth-child(2){animation-delay:-.35s}.bj-eq b:nth-child(3){animation-delay:-.7s}
+@keyframes bj-eq{0%,100%{transform:scaleY(.35)}50%{transform:scaleY(1)}}
+.bj-eq b{transform-origin:bottom}
+.bj-credit{margin:0;padding:10px 16px 14px;font-size:11px;line-height:1.55;color:var(--muted);border-top:1px solid var(--border)}
+.bj-credit a,.bj-credit button{color:var(--green);font-weight:600;text-decoration:underline;text-underline-offset:2px;font-size:11px}
+
+.bj-root :is(button,a,input):focus-visible{outline:3px solid #d29158;outline-offset:2px}
+
+/* Minimised: a 200 × 200 video tile in the bottom-left corner (Sprout lives bottom-right) */
+.bj-root.is-mini{left:max(16px,env(safe-area-inset-left,0px));bottom:max(16px,env(safe-area-inset-bottom,0px));width:202px}  /* 200px video + 1px borders */
+.bj-root.is-mini .bj-card{border-radius:14px 14px 0 0;border-bottom:0}
+.bj-root.is-mini :is(.bj-head,.bj-now,.bj-controls,.bj-repeat,.bj-list,.bj-credit){display:none}
+.bj-root.is-mini .bj-video{height:200px}
+.bj-minibar{display:flex;align-items:center;gap:2px;padding:4px 4px 4px 10px;background:var(--paper);border:1px solid var(--border);border-top:0;border-radius:0 0 14px 14px;box-shadow:0 18px 40px #1d2a2133}
+.bj-mini-title{flex:1;min-width:0;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bj-minibar .bj-icon{width:34px;height:34px}
+
+/* Welcome bubble beside the bird */
+.bj-invite{position:fixed;z-index:65;display:flex;align-items:flex-start;gap:6px;max-width:min(260px,calc(100vw - 20px));padding:12px 8px 12px 14px;background:var(--paper);color:var(--ink);border:1px solid var(--border);border-radius:14px 4px 14px 14px;box-shadow:0 12px 32px #1d2a2133;animation:bj-pop .35s cubic-bezier(.2,.8,.2,1)}
+.bj-invite[hidden]{display:none}
+.bj-invite p{margin:0;font-size:13px;line-height:1.5;font-weight:600}
+.bj-invite button{width:28px;height:28px;border-radius:50%;font-size:17px;color:var(--muted);flex-shrink:0}
+@keyframes bj-pop{from{opacity:0;transform:translateY(-6px)}}
+
+/* While the tile shows, keep cooking mode's controls clear of it */
+@media(min-width:701px){html.bj-tile .cook-mode .cm-shell{padding-left:max(32px,calc(232px - (100vw - 1100px) / 2))}}
+@media(max-width:700px){
+  .bj-root.is-open{top:92px;left:10px;right:10px;width:auto}
+  .bj-root.is-open .bj-card{max-height:calc(100dvh - 104px)}
+  .bj-root.is-mini{left:max(10px,env(safe-area-inset-left,0px));bottom:max(10px,env(safe-area-inset-bottom,0px))}
+  .bj-vol input{width:80px}
+  html.bj-tile .cook-mode .cm-shell{padding-bottom:calc(262px + env(safe-area-inset-bottom,0px))}
+  html.bj-tile .recipe-dialog .recipe-detail-content{padding-bottom:262px}
+  html.bj-tile .page-footer{padding-bottom:262px}
+}
+@media(prefers-reduced-motion:reduce){.bj-eq b,.bj-invite{animation:none}.bj-eq b{transform:none}}
+@media print{.bj-root,.bj-invite{display:none!important}}

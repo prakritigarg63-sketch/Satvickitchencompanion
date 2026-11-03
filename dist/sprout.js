@@ -560,6 +560,7 @@
     log.insertAdjacentHTML('beforeend', '<div class="sprout-thinking" aria-hidden="true"><i></i><i></i><i></i></div>');
     log.scrollTop = log.scrollHeight;
     root.classList.add('is-thinking');
+    document.dispatchEvent(new CustomEvent('sprout:asking', { detail: { message } }));
     announce('Sprout is thinking…');
     try {
       const history = chat.messages.slice(-10).map(m => ({ from: m.from, text: m.from === 'user' ? m.text : plain(m.reply) }));
@@ -570,8 +571,10 @@
       log.querySelector('.sprout-thinking')?.remove();
       appendMessage({ from: 'sprout', reply });
       announce(`Sprout: ${plain(reply)}`);
+      document.dispatchEvent(new CustomEvent('sprout:reply', { detail: { reply } }));
     } catch (err) {
       log.querySelector('.sprout-thinking')?.remove();
+      document.dispatchEvent(new CustomEvent('sprout:reply-failed'));
       log.insertAdjacentHTML('beforeend', `<div class="sprout-error" role="alert"><span>Sorry, I couldn’t answer just now.</span><button type="button" class="sprout-action" data-retry="${esc(message)}">Retry</button></div>`);
       log.scrollTop = log.scrollHeight;
     } finally {
@@ -583,6 +586,7 @@
   function sproutSays(reply) {
     appendMessage({ from: 'sprout', reply });
     announce(`Sprout: ${plain(reply)}`);
+    document.dispatchEvent(new CustomEvent('sprout:reply', { detail: { reply } }));
   }
 
   form.addEventListener('submit', e => {
@@ -654,6 +658,7 @@
     btn.setAttribute('aria-label', min ? 'Expand chat' : 'Minimise chat');
     btn.innerHTML = min ? svg('<path d="M6 15l6-6 6 6"/>') : svg('<path d="M5 12h14"/>');
     root.classList.toggle('is-chatting', !min);
+    if (min) document.dispatchEvent(new CustomEvent('sprout:minimise'));
     if (!min) { log.scrollTop = log.scrollHeight; if (finePointer.matches) input.focus({ preventScroll: true }); }
     else if (root.contains(document.activeElement) && !btn.contains(document.activeElement) && document.activeElement !== btn) btn.focus({ preventScroll: true });
   }
@@ -663,6 +668,7 @@
     mascot.setAttribute('aria-expanded', 'false');
     mascot.setAttribute('aria-label', 'Chat with Sprout, your kitchen companion');
     root.classList.remove('is-chatting', 'is-keyboard');
+    document.dispatchEvent(new CustomEvent('sprout:close'));
     if (focus) mascot.focus({ preventScroll: true });
     checkCollision();
   }
@@ -753,6 +759,7 @@
     bubble.hidden = true;
     bubble.style.translate = '';
     if (bubble.dataset.kind === 'welcome') { prefs.greeted = true; savePrefs(); }
+    if (/^welcome/.test(bubble.dataset.kind)) setTimeout(nudge, 4000);   // the evening soak reminder waits for the greeting
     document.dispatchEvent(new CustomEvent('sprout:bubble-hidden', { detail: { kind: bubble.dataset.kind } }));
     bubble.dataset.kind = '';
     if (!silent) mascot.focus({ preventScroll: true });
@@ -761,17 +768,51 @@
   bubble.addEventListener('click', e => {
     const el = e.target.closest('button'); if (!el) return;
     if (el.classList.contains('sprout-bubble-close') || el.dataset.bubble === 'later') { hideBubble(); return; }
+    if (el.dataset.bubble === 'mood') { moodReply(el.dataset.mood, e.detail === 0); return; }
+    if (el.dataset.bubble === 'recipe') { hideBubble(true); openRecipe(el.dataset.id); return; }
+    if (el.dataset.bubble === 'recipes') { hideBubble(true); go('recipes'); return; }
     if (el.dataset.bubble === 'chat') { hideBubble(true); open(); return; }
     if (el.dataset.bubble === 'wins') { hideBubble(true); go('progress'); }
     if (el.dataset.bubble === 'soaked') { hideBubble(true); if (!state.soaked.includes(el.dataset.id)) state.soaked.push(el.dataset.id); render(); toast('Soaking. Tomorrow’s meal is ready to go.'); }
   });
-  function welcome() {
-    if (prefs.greeted || prefs.hidden) return;
-    showBubble(`<p>Hi, I’m Sprout 🌱 Need a little help in your kitchen?</p>
-      <div class="sprout-bubble-actions"><button type="button" class="button primary" data-bubble="chat">Yes, let’s chat</button><button type="button" class="button outline" data-bubble="later">Not now</button></div>`, { label: 'Sprout says hello', kind: 'welcome' });
+  /* Greeting on every load or refresh: Sprout waves, says hello and asks how the cook is. Each answer
+     gets a reply built from the cook's own plan (next meal, or the quickest one when tired).
+     ?tour=0 (screenshots and QA) skips it unless &greet=1 is added. */
+  const params = new URLSearchParams(location.search);
+  const greetAllowed = params.get('greet') === '1' || params.get('tour') !== '0';
+  const MOODS = [['well', '😊', 'Doing well'], ['tired', '😴', 'A bit tired'], ['hungry', '🍲', 'Hungry!']];
+  function greet() {
+    if (!greetAllowed || prefs.hidden || !panel.hidden || document.querySelector('dialog[open]')) return false;
+    const who = state.name ? `, ${esc(state.name)}` : '';
+    const shown = showBubble(`<p class="sprout-greet"><strong>Hi, I’m Sprout 🌱</strong> Hope you are doing well${who}.</p>
+      <p class="sprout-greet-ask">How are you feeling today?</p>
+      <div class="sprout-moods" role="group" aria-label="How are you feeling today?">${MOODS.map(([id, e, l]) => `<button type="button" data-bubble="mood" data-mood="${id}"><span aria-hidden="true">${e}</span> ${l}</button>`).join('')}</div>
+      <button type="button" class="sprout-greet-chat" data-bubble="chat">Or chat with me</button>`, { label: 'Sprout says hello', kind: 'welcome', autoHide: 16000 });
+    if (!shown) return false;
     wave();
-    announce('Sprout says: Hi, I’m Sprout. Need a little help in your kitchen?');
+    announce('Sprout says: Hi, I’m Sprout. Hope you are doing well. How are you feeling today?');
+    return true;
   }
+  function moodReply(mood, fromKeyboard) {
+    const open = state.plan.filter(id => id && !state.planDone.includes(id)).map(find).filter(Boolean);
+    const next = find(nextToCook());
+    const quick = [...(open.length ? open : available())].sort((a, b) => a.time - b.time)[0];
+    let text, pick;
+    if (mood === 'tired') { pick = quick; text = quick ? `Let’s keep tonight easy. ${quick.name} takes just ${quick.time} minutes of active cooking.` : 'Let’s keep tonight easy. Rest well, and cook something simple.'; }
+    else if (mood === 'hungry') { pick = next || quick; text = pick ? `Then let’s get cooking! ${pick.name} takes ${pick.time} minutes.` : 'Then let’s find you something to cook!'; }
+    else { pick = next; text = next ? `Lovely to hear! ${next.name} is next on your plan, ready when you are.` : 'Lovely to hear! You’ve cooked this whole week. Shall we find something new?'; }
+    const primary = pick
+      ? `<button type="button" class="button primary" data-bubble="recipe" data-id="${esc(pick.id)}">${mood === 'tired' ? 'Show me' : 'Start cooking'}</button>`
+      : '<button type="button" class="button primary" data-bubble="recipes">See recipes</button>';
+    showBubble(`<p>${esc(text)}</p><div class="sprout-bubble-actions">${primary}<button type="button" class="button outline" data-bubble="chat">Chat with Sprout</button></div>`, { label: 'Sprout replies', kind: 'welcome-reply', autoHide: 14000 });
+    play('is-happy', 1600);
+    announce(`Sprout says: ${text}`);
+    if (fromKeyboard) bubble.querySelector('.button.primary')?.focus({ preventScroll: true });
+    try { if (window.SproutVoice?.state().prefs.speak) window.SproutVoice.speak(text); } catch {}
+  }
+  // Hovering over or focusing a bubble keeps it open.
+  bubble.addEventListener('pointerenter', () => clearTimeout(bubbleTimer));
+  bubble.addEventListener('focusin', () => clearTimeout(bubbleTimer));
 
   /* Contextual nudge: in the evening, if a planned meal needs soaking and it isn't done yet,
      say so once per day. No generic hello. */
@@ -789,7 +830,7 @@
       announce(`Sprout says: soak ${soakAmount(r)} ${r.soak.what} tonight for ${r.name}.`);
     }
   }
-  document.addEventListener('ritual:done', () => setTimeout(nudge, 6000));
+  document.addEventListener('ritual:done', () => setTimeout(() => { if (!greet()) nudge(); }, 1500));
 
   /* After "I cooked this!" the recipe dialog is still open over Sprout, so the
      celebration waits for it to close. */
@@ -817,7 +858,7 @@
   let manualUntuckUntil = 0, raf = 0, focusInside = false;
   function homeRect() {
     const r = root.getBoundingClientRect();
-    const w = parseFloat(getComputedStyle(root).getPropertyValue('--sprout-w')) || 90;
+    const w = parseFloat(getComputedStyle(root).getPropertyValue('--sprout-w')) || 120;
     const h = w * 298 / 360;
     return { left: r.right - w, right: r.right, top: r.bottom - h, bottom: r.bottom, width: w, height: h };
   }
@@ -888,7 +929,7 @@
    * ================================================================== */
   applyHidden();
   if (chat.open && !prefs.hidden) { open(); if (chat.minimised) minimise(true); document.activeElement?.blur(); }
-  else setTimeout(nudge, 2500);
+  else setTimeout(() => { if (!greet()) nudge(); }, 1200);
   checkCollision();
 
   window.Sprout = {

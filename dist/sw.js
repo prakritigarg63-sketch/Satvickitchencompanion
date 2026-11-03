@@ -1,8 +1,8 @@
 // Satvic Kitchen Companion: offline support.
 // Bump VERSION whenever the precache list changes; old caches are cleared on activate.
-const VERSION = 'satvic-v7';
+const VERSION = 'satvic-v10';
 const SHELL = [
-  './', 'index.html', 'style.css', 'editorial.css', 'sprout.css', 'sounds.css', 'cursor.css', 'exclusive.css', 'app.js', 'cook-mode.js', 'ritual.js', 'masthead.js', 'sprout.js', 'sounds.js', 'credits.html', 'manifest.webmanifest',
+  './', 'index.html', 'style.css', 'editorial.css', 'sprout.css', 'sounds.css', 'sprout-voice.css', 'bhajans.css', 'cursor.css', 'exclusive.css', 'app.js', 'cook-mode.js', 'ritual.js', 'masthead.js', 'sprout.js', 'sounds.js', 'sprout-voice.js', 'bhajans.js', 'credits.html', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png',
   'assets/bird/white-eye.png',
   'assets/cursor/leaf-cursor.png', 'assets/cursor/leaf-cursor@2x.png',

@@ -7,6 +7,7 @@
  * Public API (used by Sprout's chat): window.KitchenCalm
  *   open() close() minimise() play(id?) → Promise<{ok, reason?, track}> pause() stop() next() prev()
  *   setVolume(0–1) changeVolume(±) setMuted(bool) setRepeat(bool) retry() cue('chime'|'bell')
+ *   duck(bool) — lower the music while Sprout listens or speaks (not saved)
  *   prime()  — call synchronously inside a click/keypress so the browser allows sound
  *   state()  tracks
  */
@@ -68,9 +69,13 @@
     } catch { ctx = null; }
   }
   const usingGraph = () => ctx && master;
-  function applyVolume(instant) {
-    const v = prefs.muted ? 0 : prefs.volume;
-    if (usingGraph()) master.gain.setTargetAtTime(v, ctx.currentTime, instant ? 0.001 : 0.08);
+  // Sprout's voice lowers the music while it listens or speaks. Not saved: prefs.volume and the slider
+  // never change, so the previous volume comes back exactly.
+  let duckLevel = 1;
+  function duck(on) { const next = on ? 0.2 : 1; if (next === duckLevel) return; duckLevel = next; applyVolume(false, on ? 0.25 : 0.6); }
+  function applyVolume(instant, tau = 0.08) {
+    const v = (prefs.muted ? 0 : prefs.volume) * duckLevel;
+    if (usingGraph()) master.gain.setTargetAtTime(v, ctx.currentTime, instant ? 0.001 : tau);
     else Object.entries(nodes).forEach(([id, n]) => { n.el.volume = Math.min(1, v * (find(id).level ?? 1) * (n.fade ?? 1)); });
   }
   function node(id) {
@@ -287,6 +292,8 @@
   btn.setAttribute('aria-controls', 'kc-panel');
   btn.setAttribute('aria-expanded', 'false');
   btn.innerHTML = `<span class="bird-fly" aria-hidden="true"><img src="assets/bird/white-eye.png" alt="" width="46" height="33" draggable="false"></span><span class="bird-notes" aria-hidden="true"><i>♪</i><i>♫</i><i>♪</i></span>`;
+  // When the Krishna bhajan player (bhajans.js) claims the bird, it manages the bird's label and singing.
+  const ownsBird = () => btn.dataset.owner !== 'bhajans';
   const tools = document.querySelector('.header-tools');
   tools?.insertBefore(btn, document.getElementById('mobile-menu'));      // last on desktop; just before the menu on phones
 
@@ -306,9 +313,11 @@
     const t = find(current || prefs.track), active = isActive();
     const focusTrack = document.activeElement?.dataset?.track;
     root.classList.toggle('is-playing', status === 'playing');
-    btn.classList.toggle('is-playing', status === 'playing');
-    btn.setAttribute('aria-label', status === 'playing' ? `Kitchen Calm sounds, playing ${t.name}` : 'Kitchen Calm sounds');
-    btn.setAttribute('aria-expanded', String(mode === 'open'));
+    if (ownsBird()) {
+      btn.classList.toggle('is-playing', status === 'playing');
+      btn.setAttribute('aria-label', status === 'playing' ? `Kitchen Calm sounds, playing ${t.name}` : 'Kitchen Calm sounds');
+      btn.setAttribute('aria-expanded', String(mode === 'open'));
+    }
     $('#kc-now-name').textContent = t.name;
     $('#kc-status').textContent = statusText();
     for (const b of root.querySelectorAll('[data-kc="toggle"]')) {
@@ -405,7 +414,7 @@
   root.addEventListener('keydown', e => {
     if (e.key === 'Escape' && !panel.hidden && panel.contains(e.target)) { e.preventDefault(); e.stopPropagation(); close(); }
   });
-  btn.addEventListener('click', () => { prime(); mode === 'open' ? close() : open(btn); });
+  btn.addEventListener('click', () => { if (!ownsBird()) return; prime(); mode === 'open' ? close() : open(btn); });
   // On phones the player and Sprout's chat share the bottom of the screen: opening one tucks the other away.
   document.addEventListener('sprout:open', () => { if (compact.matches && mode === 'open') { mode = current ? 'mini' : 'closed'; render(); } });
 
@@ -535,8 +544,8 @@
 
   window.KitchenCalm = {
     tracks: TRACKS.map(({ id, name, desc, src }) => ({ id, name, desc, available: !!src })),
-    state: () => ({ track: prefs.track, current, status, volume: prefs.volume, muted: prefs.muted, repeat: prefs.repeat, cues: prefs.cues, cueVolume: prefs.cueVolume, mode, invite: prefs.invite }),
-    open, close, minimise, play, pause, stop, retry, cue, prime, setVolume, setMuted, setRepeat,
+    state: () => ({ track: prefs.track, current, status, volume: prefs.volume, muted: prefs.muted, repeat: prefs.repeat, cues: prefs.cues, cueVolume: prefs.cueVolume, mode, invite: prefs.invite, ducked: duckLevel < 1, level: (prefs.muted ? 0 : prefs.volume) * duckLevel }),
+    open, close, minimise, play, pause, stop, retry, cue, prime, setVolume, setMuted, setRepeat, duck,
     next: () => step(1), prev: () => step(-1),
     changeVolume: d => setVolume(Math.round((prefs.volume + d) * 20) / 20),
   };

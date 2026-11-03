@@ -112,8 +112,8 @@
 
 /* ---------- phones: above Sprout, inside the safe areas ---------- */
 @media(max-width:700px){
-  .kc-panel{left:max(10px,env(safe-area-inset-left,0px));right:max(10px,env(safe-area-inset-right,0px));width:auto;bottom:calc(65px + 28px + env(safe-area-inset-bottom,0px));max-height:calc(100dvh - 65px - 120px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))}
-  .kc-mini{left:max(12px,env(safe-area-inset-left,0px));right:calc(65px + 28px + env(safe-area-inset-right,0px));max-width:none;bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+  .kc-panel{left:max(10px,env(safe-area-inset-left,0px));right:max(10px,env(safe-area-inset-right,0px));width:auto;bottom:calc(84px + 28px + env(safe-area-inset-bottom,0px));max-height:calc(100dvh - 84px - 120px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))}
+  .kc-mini{left:max(12px,env(safe-area-inset-left,0px));right:calc(84px + 28px + env(safe-area-inset-right,0px));max-width:none;bottom:calc(16px + env(safe-area-inset-bottom,0px))}
   .kc-invite{padding-right:36px}
   .kc-invite-sprout{width:44px}
   /* Sprout's chat and the player share the bottom of the screen: the chat wins while it is open */
