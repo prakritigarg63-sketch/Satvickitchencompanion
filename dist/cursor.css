@@ -1,0 +1,64 @@
+/* Sage leaf cursor
+   Native CSS cursors only: the browser draws the leaf, so it tracks the pointer with no lag
+   and clicks land exactly on the hotspot — the leaf's pointed upper-left tip (1px, 1px).
+
+   Applied only to a mouse or trackpad. Touch devices, and forced-colour (high contrast)
+   modes, keep their system cursors. Each rule lists the plain 32px PNG first, then a
+   2× image-set for sharp screens; browsers keep the last version they understand, and
+   fall back to the standard `auto` / `pointer` cursor if the image can't load. */
+
+@media (hover: hover) and (pointer: fine) and (forced-colors: none) {
+  /* Browsing: the whole page, including text, photos and dialog backdrops. */
+  html,
+  dialog::backdrop {
+    cursor: url("assets/cursor/leaf-cursor.png") 1 1, auto;
+    cursor: -webkit-image-set(url("assets/cursor/leaf-cursor.png") 1x, url("assets/cursor/leaf-cursor@2x.png") 2x) 1 1, auto;
+    cursor: image-set(url("assets/cursor/leaf-cursor.png") 1x, url("assets/cursor/leaf-cursor@2x.png") 2x) 1 1, auto;
+  }
+
+  /* Clickable controls keep the leaf too (overrides the existing `cursor: pointer` rules);
+     if the image is unavailable they fall back to the hand pointer. */
+  a[href],
+  button,
+  .sprout-button,   /* Sprout sets its own `cursor: pointer` with a class selector */
+  summary,
+  label,
+  select,
+  [role="button"],
+  [tabindex]:not([tabindex="-1"]):not(input):not(textarea),
+  input[type="checkbox"],
+  input[type="radio"],
+  input[type="range"],
+  input[type="submit"],
+  input[type="button"],
+  input[type="reset"],
+  input[type="file"] {
+    cursor: url("assets/cursor/leaf-cursor.png") 1 1, pointer;
+    cursor: -webkit-image-set(url("assets/cursor/leaf-cursor.png") 1x, url("assets/cursor/leaf-cursor@2x.png") 2x) 1 1, pointer;
+    cursor: image-set(url("assets/cursor/leaf-cursor.png") 1x, url("assets/cursor/leaf-cursor@2x.png") 2x) 1 1, pointer;
+  }
+
+  /* Typing: keep the normal text cursor in fields and editable content. */
+  input:not([type]),
+  input[type="text"],
+  input[type="search"],
+  input[type="email"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="password"],
+  textarea,
+  [contenteditable]:not([contenteditable="false"]) {
+    cursor: text;
+  }
+
+  /* Disabled controls keep the system cursor, as before. Resize handles are untouched:
+     no rule here sets a *-resize cursor, so the browser's own resize cursors still show. */
+  button:disabled,
+  input:disabled,
+  select:disabled,
+  textarea:disabled,
+  [aria-disabled="true"] {
+    cursor: default;
+  }
+}
