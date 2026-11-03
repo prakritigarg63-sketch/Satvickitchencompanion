@@ -8,7 +8,7 @@ web
 
 ## Stack
 
-Static HTML, CSS and vanilla JavaScript with no framework and no build step. The prototype lives in `dist/`: `index.html`, `style.css` (base), `editorial.css` (the editorial layout and a readability layer, loaded after the base), `app.js`, `credits.html` and `assets/`. Fonts load from Google Fonts. All state is kept in the browser's `localStorage` under the key `satvic-kitchen-concept-v1`.
+Static HTML, CSS and vanilla JavaScript with no framework and no build step. The prototype lives in `dist/`: `index.html`, `style.css` (base), `editorial.css` (the editorial layout and a readability layer, loaded after the base), `app.js`, `credits.html` and `assets/`. It is also an installable web app: `manifest.webmanifest`, `icons/`, and `sw.js` (offline support; bump its `VERSION` when the precache list changes). Each view has its own URL (`#plan`, `#recipes`, `#shopping`, `#progress`), so the Back button moves between views and closes dialogs. Fonts load from Google Fonts. All state is kept in the browser's `localStorage` under the key `satvic-kitchen-concept-v1`.
 
 The owner earlier named React / Next.js for the product. The shipped prototype is vanilla, and moving to a framework is an **open decision**, not a plan.
 
