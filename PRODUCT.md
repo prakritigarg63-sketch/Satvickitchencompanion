@@ -61,6 +61,13 @@ The owner's stated longer-term direction is **pantry-first**: start from what is
   - The remaining-item count shows both on the page and in the header navigation badge.
 - Small wins keeps all-time cooked recipes separate from progress through the current plan. Per-recipe feedback options: Easy & enjoyable / Took longer / Missing ingredients.
 - Reset demo restores the default state.
+- **Sprout**, a kitchen-companion mascot (`sprout.js`, `sprout.css`, `assets/sprout/`), sits bottom-right and slides aside whenever a control is underneath it.
+  - It waves once on a first visit, and the greeting can be dismissed. Sprout can be hidden, and brought back from the footer.
+  - Its chat panel answers from the app's real state and recipes, using the same scaling helpers (`scaledIngredients`, `scaledStep`) as the recipe dialog.
+  - Reply buttons call the existing handlers (view recipe, choose a day, open plan, shopping list, start cooking, small wins). Suggestions never change the plan; only picking a day does.
+  - With no AI service configured it runs in **Guided kitchen help** mode, a local intent engine behind an adapter. Adding `<meta name="sprout-endpoint" content="/api/…">` switches to a server endpoint that keeps its own credentials; replies are checked against real recipes and allowed actions.
+  - Sprout's own state uses `satvic-sprout-v1` (localStorage) and `satvic-sprout-chat-v1` (sessionStorage); it never writes to the app's key.
+  - The animation layers are cut from the supplied artwork (body, arm, leaves, eyes) so the arm can wave around the shoulder while the body stays still.
 
 **Terminology:**
 - *My meal plan*, *Explore recipes*, *Shopping list*, *My small wins*

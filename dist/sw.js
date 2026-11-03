@@ -1,9 +1,10 @@
 // Satvic Kitchen Companion: offline support.
 // Bump VERSION whenever the precache list changes; old caches are cleared on activate.
-const VERSION = 'satvic-v1';
+const VERSION = 'satvic-v2';
 const SHELL = [
-  './', 'index.html', 'style.css', 'editorial.css', 'app.js', 'credits.html', 'manifest.webmanifest',
+  './', 'index.html', 'style.css', 'editorial.css', 'sprout.css', 'app.js', 'sprout.js', 'credits.html', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png',
+  'assets/sprout/body.png', 'assets/sprout/arm.png', 'assets/sprout/leaves.png', 'assets/sprout/eye-left.png', 'assets/sprout/eye-right.png', 'assets/sprout/full.png',
   // The hero and the default three meals, so the first screen works offline right away.
   'assets/hero.jpg', 'assets/khichdi.jpg', 'assets/chickpea.jpg', 'assets/soup.jpg',
 ];
